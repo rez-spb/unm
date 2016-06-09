@@ -1,0 +1,188 @@
+{
+	"newbiedw_options_desc" : "Mod for keeping the game playable",
+	
+	"broadcastinfo_options_hidden" : "Transmit to clients",
+	"broadcastinfo_options_hidden_desc" : "Transmit information to other clients",
+
+	"noobiedw_options_hidden" : "Kick hidden profiles",
+	"noobiedw_options_hidden_desc" : "Kick hidden profiles",
+
+	"perkdeck0_options" : "Perk deck 0/9 players",
+	"perkdeck0_options_desc" : "Kick players with perk deck completion 0/9",
+
+	"perkinfo_options" : "Print skill/perk info",
+	"perkinfo_options_desc" : "Print information about joined persons skills",
+
+	"noobie_loud_dw_options_hours" : "Deathwish loud",
+	"noobie_loud_dw_options_hours_desc" : "Minimum amount of hours for deathwish difficulty with loud tag/no tag",
+
+	"noobie_stealth_dw_options_hours" : "Deathwish stealth",
+	"noobie_stealth_dw_options_hours_desc" : "Minimum amount of hours for deathwish difficulty with stealth tag",
+	
+	"noobie_loud_ovk_options_hours" : "Overkill loud",
+	"noobie_loud_ovk_options_hours_desc" : "Minimum amount of hours for overkill difficulty with loud tag/no tag",
+	
+	"noobie_stealth_ovk_options_hours" : "Overkill stealth",
+	"noobie_stealth_ovk_options_hours_desc" : "Minimum amount of hours for overkill difficulty with stealth tag",
+
+	"perkdeck1_options_desc" : "Kick Criew chief",
+	"perkdeck2_options_desc" : "Kick Muscle",
+	"perkdeck3_options_desc" : "Kick Armorer",
+	"perkdeck4_options_desc" : "Kick Rogue",
+	"perkdeck5_options_desc" : "Kick Hitman",
+	"perkdeck6_options_desc" : "Kick Crook",
+	"perkdeck7_options_desc" : "Kick Burglar",
+	"perkdeck8_options_desc" : "Kick Infiltrator",
+	"perkdeck9_options_desc" : "Kick Sociopath",
+	"perkdeck10_options_desc" : "Kick Gambler",
+	"perkdeck11_options_desc" : "Kick Grinder",
+	"perkdeck12_options_desc" : "Kick Yakuza",
+	"perkdeck13_options_desc" : "Kick Ex-President",
+	"perkdeck14_options_desc" : "Kick Maniac",
+	"perkdeck15_options_desc" : "Kick Anarchist",
+	
+	"hiddenkickinfamy_options" : "Hidden infamy",
+	"hiddenkickinfamy_options_desc" : "Hidden infamy lookup (Requires: Kick Hidden profiles)",
+
+	"hiddenkickinfamylevel_options" : "Hidden minimum infamy",
+	"hiddenkickinfamylevel_options_desc" : "Minimum infamy level for hidden profiles (Requires: Kick Hidden profiles and Hidden infamy)",
+	
+	"lobby_create_message_1" : "This lobby will auto kick",
+	"lobby_create_message_2" : "hidden profiles and",
+	"lobby_create_message_3" : "players with under",
+	"lobby_create_message_4" : "hours total playtime from the game.",
+	
+	"kick_option_off" : "Kicking turned off",
+	"kick_option_on_1" : "Turned on kicking for under ",
+	"kick_option_on_2" : "hours",
+	"kick_option_on_3" : "Hidden profiles will",
+	"kick_option_on_4" : "not be kicked",
+	"kick_option_on_5" : "be kicked",
+
+	"player_whitelist" : "is from whitelist.",
+	"player_blacklist" : "is from blacklist.",
+	"player_was_hidden" : "had hidden profile.",
+	"player_is_hidden" : "has hidden profile.",
+	
+	"hours_kicked_1" : "kicked for having",
+	"hours_kicked_2" : "hours",
+	
+	"hours_joined_1" : "has",
+	"hours_joined_2" : "hours",
+	
+	"cheater_ban" : "was banned for using too many skill points",
+	
+	"perk_deck_kick_1" : "kicked for using",
+	"perk_deck_kick_2" : "perk deck",
+	"perk_deck_kick_3" : "kicked for 0/9 perk deck",
+	"perk_deck_kick_4" : "kicked for too low infamy",
+	"perk_deck_kick_5" : "kicked for too high infamy",
+	
+	"greet_message_language" : "Localised welcome message",
+	"greet_message_language_desc" : "Select either the messages will be the same language as your game or in english",
+	
+	"no_deployable_kick" : "No deployable",
+	"no_deployable_kick_desc" : "Will kick people with no deployables from the game.(Only works if the game has already started)",
+	"sentry_gun_single_kick_desc" : "Will kick people with one turret deployable.(Only works if the game has already started)",
+	"bodybags_bag_kick_desc" : "Will kick people with body bags deployable.(Only works if the game has already started)",
+	"armor_kit_kick_desc" : "Will kick people with armor bag deployable.(Only works if the game has already started)",
+	"ecm_jammer_kick_desc" : "Will kick people with one ecm jammer deployable.(Only works if the game has already started)",
+	"first_aid_kit_kick_desc" : "Will kick people with four first aid kit deployables.(Only works if the game has already started)",
+	
+	"pd2_anticheat" : "Pd2stats anti cheat",
+	"pd2_anticheat_desc" : "Use pd2stats anti cheat to ban cheaters",
+	
+	"pd2_cheater" : "cheated and was banned"
+	
+	"hidden_infamy_V_kick" : "Infamy V-100 kick",
+	"hidden_infamy_V_kick_desc" : "Kick hidden profiles that have V-100 infamy (Requires to use: Kick Hidden profiles and Hidden infamy)",
+
+	"hidden_infamy_XXV_kick" : "Infamy XXV-100 kick",
+	"hidden_infamy_XXV_kick_desc" : "Kick hidden profiles that have XXV-100 infamy (Requires to use: Kick Hidden profiles and Hidden infamy)",	
+
+	"incomplete_perk_deck_kick" : "Incomplete perk deck",
+	"incomplete_perk_deck_kick_desc" : "Kick people that have incomplete perk deck Exmpl: Hitman 8/9",
+	
+	"armor_lvl_1_desc" : "Kick people with two piece suit (Only works if the game has already started)",	
+	"armor_lvl_2_desc" : "Kick people with light ballistic vest (Only works if the game has already started)",
+	"armor_lvl_3_desc" : "Kick people with ballistic vest (Only works if the game has already started)",	
+	"armor_lvl_4_desc" : "Kick people with heavy ballistic vest (Only works if the game has already started)",	
+	"armor_lvl_5_desc" : "Kick people with flack jacket (Only works if the game has already started)",	
+	"armor_lvl_6_desc" : "Kick people with combined tactical vest (Only works if the game has already started)",	
+	"armor_lvl_7_desc" : "Kick people with improved tactical vest (Only works if the game has already started)",		
+	
+	"infamyxxv_kick" : "had XXV-100 hidden profile",
+	"infamyv_kick" : "had V-100 hidden profile",
+	
+	"that_one_string" : ""
+	
+	"hiddenkickinfamylevelmax_options" : "Hidden maximum infamy",
+	"hiddenkickinfamylevelmax_options_desc" : "Maximum infamy level for hidden profiles (Requires: Kick Hidden profiles and Hidden infamy)",
+	
+	"pd2_anticheat_heists" : "Not enough heists completed",
+	"pd2_anticheat_heists_desc" : "Blacklist people with 'Not enough heists completed to reach infamy whatever'.\nI have made this, because this setting has a lot of false positives",
+	
+	"NGBTO_Off" : "Mod is currently turned off."
+	
+	"total_count_kick" : "had completed too few heists"
+	"deathwish_count_kick" : "had completed too few heists on deathwish"
+	
+	"deathwish_count_kick_menu" : "Deathwish count"
+	"deathwish_count_kick_menu_desc" : "Kick people with less than desired number of deathwish games completed"
+	
+	"deathwish_count_kick_int_menu" : "Deathwish count number"
+	"deathwish_count_kick_int_menu_desc" : "Requires: Deathwish count"
+	
+	"total_count_kick_menu" : "Total count"
+	"total_count_kick_menu_desc" : "Kick people with less than desired number of games completed"
+	
+	"total_count_kick_int_menu" : "Total count number"
+	"total_count_kick_int_menu_desc" : "Requires: Total count"
+	
+	"lobby_not_supported" : "This lobby will print information about joining people and ban cheaters automatically"
+	
+	"NGBTO_language" : "Language"
+	"NGBTO_language_desc" : "Select language of the mod (Requires restart to take affect)"
+
+	"Toggle_Name" : "Turn ON/OFF kicking"
+	"Toggle_Desc" : "With this keybind you can select to turn off mod at any time"
+	
+	"Newbie_Statistics" : "Statistics"
+	"Newbie_Kills" : "Kills"
+	"Newbie_Spec_Kills" : "Special Kills"
+	"Newbie_Headshots" : "Headshots"
+	"Newbie_Accuracy" : "Accuracy"
+	"Newbie_Downs" : "Downs"
+	"newbie_Statistics_Title" : "Print statistics"
+	"newbie_Statistics_Desc" : "Print statistics after the end of the heist (only for the host)"
+	
+	"Skill_Info_Name" : "Print information to the hud"
+	"Skill_Info_Name_Desc" : "When pressed it will display everyones information in a quick overlay"
+	
+	"pd_anticheat_self" : "ingame anti cheat"
+	
+	"hidden_kick_on" : " Hidden profiles will be kicked"
+	
+	"ingame_anticheat" : "Use ingame anticheat"
+	"ingame_anticheat_desc" : "Ban people that are tagged by the ingame anticheat"
+	
+	"Manual_ban_title" : "Manual ban"
+	"Manual_ban_desc" : "Select people from the current playlist to add them to the blacklist"
+	"Manual_ban_select" : "Select who to ban"
+	"Manual_ban_button" : "BAN"
+	"player_inspect_title" : "Player inspection"
+	"player_inspect_desc" : "Display various infomation about the selected player"
+	"player_inspection" : "Inspect selected person"
+	"Back" : "Back"
+	"Level" : "Level"
+	"clean" : "Clean"
+	"warning" : "WARNING!"
+	"Player" : "Player"
+	"Playtime" : "Playtime"
+	"Achievements" : "Achievements"
+	"VAC_status" : "VAC status"
+	"Pd2Stats_check" : "Pd2Stats status"
+	"hidden" : "Hidden"
+	"manually_added_to_blacklist" : "has been added to blacklist" 
+	"refresh" : "refresh" 
+}

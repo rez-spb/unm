@@ -1,5 +1,9 @@
 {
 	"newbiedw_options_desc" : "Mod for keeping the game playable",
+	"unm_join_description": "UnNoobMe - mod for keeping noobs out. Based on NGBTO.",
+	
+	"friend_whitelist" : "Whitelist friends",
+	"friend_whitelist_desc" : "Treat friends as whitelisted (skip checks for them)",
 	
 	"broadcastinfo_options_hidden" : "Transmit to clients",
 	"broadcastinfo_options_hidden_desc" : "Transmit information to other clients",
@@ -25,6 +29,12 @@
 	"noobie_stealth_ovk_options_hours" : "Overkill stealth",
 	"noobie_stealth_ovk_options_hours_desc" : "Minimum amount of hours for overkill difficulty with stealth tag",
 
+	"noobie_loud_vh_options_hours" : "Very Hard loud",
+	"noobie_loud_vh_options_hours_desc" : "Min. amount of hours (rounded down) for very hard with loud tag/no tag",
+	
+	"noobie_stealth_vh_options_hours" : "Very Hard stealth",
+	"noobie_stealth_vh_options_hours_desc" : "Min. amount of hours (rounded down) for very hard with stealth tag",
+
 	"perkdeck1_options_desc" : "Kick Criew chief",
 	"perkdeck2_options_desc" : "Kick Muscle",
 	"perkdeck3_options_desc" : "Kick Armorer",
@@ -47,10 +57,10 @@
 	"hiddenkickinfamylevel_options" : "Hidden minimum infamy",
 	"hiddenkickinfamylevel_options_desc" : "Minimum infamy level for hidden profiles (Requires: Kick Hidden profiles and Hidden infamy)",
 	
-	"lobby_create_message_1" : "This lobby will auto kick",
+	"lobby_create_message_1" : "Lobby will kick",
 	"lobby_create_message_2" : "hidden profiles and",
 	"lobby_create_message_3" : "players with under",
-	"lobby_create_message_4" : "hours total playtime from the game.",
+	"lobby_create_message_4" : "hours total playtime.",
 	
 	"kick_option_off" : "Kicking turned off",
 	"kick_option_on_1" : "Turned on kicking for under ",
@@ -59,6 +69,7 @@
 	"kick_option_on_4" : "not be kicked",
 	"kick_option_on_5" : "be kicked",
 
+	"player_friendlist" : "is from friendlist.",
 	"player_whitelist" : "is from whitelist.",
 	"player_blacklist" : "is from blacklist.",
 	"player_was_hidden" : "had hidden profile.",
@@ -81,13 +92,14 @@
 	"greet_message_language" : "Localised welcome message",
 	"greet_message_language_desc" : "Select either the messages will be the same language as your game or in english",
 	
-	"no_deployable_kick" : "No deployable",
-	"no_deployable_kick_desc" : "Will kick people with no deployables from the game.(Only works if the game has already started)",
-	"sentry_gun_single_kick_desc" : "Will kick people with one turret deployable.(Only works if the game has already started)",
-	"bodybags_bag_kick_desc" : "Will kick people with body bags deployable.(Only works if the game has already started)",
-	"armor_kit_kick_desc" : "Will kick people with armor bag deployable.(Only works if the game has already started)",
-	"ecm_jammer_kick_desc" : "Will kick people with one ecm jammer deployable.(Only works if the game has already started)",
-	"first_aid_kit_kick_desc" : "Will kick people with four first aid kit deployables.(Only works if the game has already started)",
+	"kick_only_count" : "only"
+	"no_deployable_kick" : "no deployable",
+	"no_deployable_kick_desc" : "Kick people with no deployables. (From already started game)",
+	"sentry_gun_single_kick_desc" : "Kick people with 1 turret. (From already started game)",
+	"bodybags_bag_kick_desc" : "Kick people with body bags. (From already started game)",
+	"armor_kit_kick_desc" : "Kick people with armor bag. (From already started game)",
+	"ecm_jammer_kick_desc" : "Kick people with 1 ecm. (From already started game)",
+	"first_aid_kit_kick_desc" : "Kick people with 4 first aid kits. (From already started game)",
 	
 	"pd2_anticheat" : "Pd2stats anti cheat",
 	"pd2_anticheat_desc" : "Use pd2stats anti cheat to ban cheaters",
@@ -103,13 +115,13 @@
 	"incomplete_perk_deck_kick" : "Incomplete perk deck",
 	"incomplete_perk_deck_kick_desc" : "Kick people that have incomplete perk deck Exmpl: Hitman 8/9",
 	
-	"armor_lvl_1_desc" : "Kick people with two piece suit (Only works if the game has already started)",	
-	"armor_lvl_2_desc" : "Kick people with light ballistic vest (Only works if the game has already started)",
-	"armor_lvl_3_desc" : "Kick people with ballistic vest (Only works if the game has already started)",	
-	"armor_lvl_4_desc" : "Kick people with heavy ballistic vest (Only works if the game has already started)",	
-	"armor_lvl_5_desc" : "Kick people with flack jacket (Only works if the game has already started)",	
-	"armor_lvl_6_desc" : "Kick people with combined tactical vest (Only works if the game has already started)",	
-	"armor_lvl_7_desc" : "Kick people with improved tactical vest (Only works if the game has already started)",		
+	"armor_lvl_1_desc" : "Kick people in two piece suit. (From already started game)",
+	"armor_lvl_2_desc" : "Kick people in light ballistic vest. (From already started game)",
+	"armor_lvl_3_desc" : "Kick people in ballistic vest. (From already started game)",
+	"armor_lvl_4_desc" : "Kick people in heavy ballistic vest. (From already started game)",
+	"armor_lvl_5_desc" : "Kick people in flack jacket. (From already started game)",
+	"armor_lvl_6_desc" : "Kick people in combined tactical vest. (From already started game)",
+	"armor_lvl_7_desc" : "Kick people in improved tactical vest. (From already started game)",
 	
 	"infamyxxv_kick" : "had XXV-100 hidden profile",
 	"infamyv_kick" : "had V-100 hidden profile",
@@ -139,7 +151,7 @@
 	"total_count_kick_int_menu" : "Total count number"
 	"total_count_kick_int_menu_desc" : "Requires: Total count"
 	
-	"lobby_not_supported" : "This lobby will print information about joining people and ban cheaters automatically"
+	"lobby_not_supported" : "This lobby will print information about joining people and ban cheaters automatically."
 	
 	"NGBTO_language" : "Language"
 	"NGBTO_language_desc" : "Select language of the mod (Requires restart to take affect)"

@@ -1,19 +1,26 @@
--- Add starting data
+--[[ IMPERATIVES for UNM coding:
+	CHECK = needs checking, probably unused var or something's just fishy here (he-he, get it?)
+	FIX = fix needed
+	TODO = some rework (redesign) is needed here
+--]]
+
 if not _G.NoobJoin then
-	_G.NoobJoin = _G.NoobJoin or {}
-	NoobJoin._path = ModPath
-	NoobJoin._data_path = SavePath .. "newbies_go_back_to_overkill.txt"
-	NoobJoin.settings = {
-		kickhidden_val = false,
+	_G.NoobJoin = _G.NoobJoin or {}		-- CHECK: a bit of a mistery here: if NOT exists _G.NoobJoin, then _G.NoobJoin = _G.NoobJoin? It should always be {}, right?
+	NoobJoin._path = ModPath		-- BLT-specific, points to mod's root directory
+	NoobJoin._data_path = SavePath .. "unm_savefile.txt"	-- saving data to file
+	NoobJoin._loc_path = NoobJoin._path .. "loc/"	-- path for localization
+	NoobJoin.settings = {			-- defaults (in case we don't have a file to read from)
+		friend_whitelist_val = true,	-- whitelist friends by default
+		kickhidden_val = false,		-- don't kick hidden players
 		min_hours_loud_dw_val = 6,
 		min_hours_stealth_dw_val = 7,
 		min_hours_loud_ovk_val = 4,
 		min_hours_stealth_ovk_val = 6,
-		Toggle = 1,
-		localised_message = false,
-		broadcastinfo_val = true,
-		perkdeck0_val = false,
-		perkdeck_1_val = false,
+		Toggle = 1,			-- enable kicking, FIX: register
+		localised_message = false,	-- TODO: localization should become the only way
+		broadcastinfo_val = true,	-- broadcast to everyone if server
+		perkdeck0_val = false,		-- FIX: variable does not have underscore, others do
+		perkdeck_1_val = false,		-- TODO: maybe we can optimize this?
 		perkdeck_2_val = false,
 		perkdeck_3_val = false,
 		perkdeck_4_val = false,
@@ -28,10 +35,10 @@ if not _G.NoobJoin then
 		perkdeck_13_val = false,
 		perkdeck_14_val = false,
 		perkdeck_15_val = false,
-		show_perks_info_val = true,
-		hiddeninfamycheck = false,
-		hiddeninfamy = 2,
-		hiddeninfamymax = 26,
+		show_perks_info_val = true,	-- print (? CHECK) info about perks in chat
+		hiddeninfamycheck = true,	-- check infamy on hidden profiles
+		hiddeninfamy = 2,		-- minimum infamy not to be kicked
+		hiddeninfamymax = 26,		-- maximum infamy not to be kicked
 		noequipment = false,
 		singleturret = false,
 		bodybags = false,
@@ -45,55 +52,90 @@ if not _G.NoobJoin then
 		armor5 = false,
 		armor6 = false,
 		armor7 = false,
-		incompletedeck = false,
-		hiddenxxv = false,
-		hiddenv = false,
-		usepd2statsanticheat = true,
-		tag_not_enough_heists_completed = false,
+		incompletedeck = false,		-- kick incomplete perk deck
+		hiddenxxv = false,		-- hidden XXV-100 kick (FIX: variable name is awful)
+		hiddenv = false,		-- hidden V-100 kick (FIX: variable name is awful)
+		usepd2statsanticheat = true,	-- use PD2 stats
+		tag_not_enough_heists_completed = false,	-- CHECK
 		deathwish_count_enable = false,
 		deathwish_count = 1,
 		total_count_enable = false,
 		total_count = 1,
-		Noob_language = 1,
-		Stats_Print = true,
-		ingame_anticheat = true,
+		Noob_language = 1,		-- language selector? FIX: variable name
+		Stats_Print = true,		-- print stats. FIX: variable name
+		ingame_anticheat = true,	-- R54 new, CHECK
 		}
-	NoobJoin.Name = "NGBTO"
-	NoobJoin.Players = {}
+		
+	NoobJoin.Name = "UNM"			-- name for prefix only? CHECK.
+	NoobJoin.Prefix = "[" .. NoobJoin.Name .. "]"	-- prefix for chat
+
+	-- colors
+	NoobJoin.Colors = {"E3001A", "00D000", "007DD9"}	-- colors: BAN, INFO, WHITELIST. TODO: named arrays
+	NoobJoin.Colors["kick"] = "E3001A"	-- color for kicking
+	NoobJoin.Colors["info"] = "00D000"	-- color for information
+	NoobJoin.Colors["whitelist"] = "007DD9"	-- color for whitelisting
+
+	-- blacklist and whitelist
+	NoobJoin.blacklist = {}
+	NoobJoin.blacklist_file = ModPath .. "blacklist.ini"
+	NoobJoin.whitelist = {}			-- whitelist table
+	NoobJoin.whitelist_file = ModPath .. "whitelist.ini"
+	
+	NoobJoin.synced = {}			-- no idea. CHECK
+	NoobJoin.Players = {}			-- FIX: case
+	-- check for big lobby mod. CHECK: will we have a number here (like 1 and 10 = 10?)
 	local num_player_slots = BigLobbyGlobals and BigLobbyGlobals:num_player_slots() or 4
-	for i=1,num_player_slots do -- peer info
+	for i=1,num_player_slots do		-- peer info
 		NoobJoin.Players[i] = {}
-		for j=1,3 do
+		for j=1,3 do			-- CHECK: 3 instead of 4? Really? Why?
 			NoobJoin.Players[i][j] = 0
 		end
 	end
-	NoobJoin.Prefix = "[" .. NoobJoin.Name .. "]"
-	NoobJoin.Colors = {"ff0000", "00ff04", "1a64f6"} -- RGB
-	NoobJoin.blacklist = {}
-	NoobJoin.synced = {}
 	
-	local file, err = io.open(NoobJoin._path .. "blacklist.ini", "r")
-	if file then
-		for line in file:lines() do
+	-- read blacklist file
+	local bl, _ = io.open(NoobJoin.blacklist_file, "r")
+	if bl then	-- read it to NoobJoin.blacklist table
+		for line in bl:lines() do
 			if string.sub(line, 1,1) ~= ";" then
 				table.insert(NoobJoin.blacklist, line)
 			end
 		end
+	else		-- if not, create it
+		log(NoobJoin.Prefix .. " Creating " .. NoobJoin.blacklist_file)
+		bl = io.open(NoobJoin.blacklist_file, "w")
 	end
-	if not file then
-		file = io.open(NoobJoin._path .. "blacklist.ini", "w")
-	end
-	file:close()
-	local file1, err = io.open("kicklist.ini", "r")
-	if file1 then
-		for line in file1:lines() do
-			table.insert(NoobJoin.blacklist, line)
+	bl:close()	-- close file
+
+	-- read whitelist file
+	local wl, _ = io.open(NoobJoin.whitelist_file, "r")
+	if wl then	-- read it to NoobJoin.whitelist table
+		for line in wl:lines() do
+			if string.sub(line, 1,1) ~= ";" then
+				table.insert(NoobJoin.whitelist, line)
+			end
 		end
-		file1:close()
+	else		-- if not, create it
+		log(NoobJoin.Prefix .. " Creating " .. NoobJoin.whitelist_file)
+		wl = io.open(NoobJoin.whitelist_file, "w")
 	end
+	wl:close()	-- close file
+	
+	-- TODO: maybe uncomment this later
+	-- kicklist mod? FIX: hardcoded, no path, can be absent
+	--local file1, err = io.open("kicklist.ini", "r")
+	--if file1 then
+	--	for line in file1:lines() do
+	--		table.insert(NoobJoin.blacklist, line)
+	--	end
+	--	file1:close()
+	--end
 end
 
+
 function NoobJoin:Load()
+	--[[	Function from Options.lua in R41
+		Loads file '_data_path'
+	]]
 	local file = io.open(NoobJoin._data_path, "r")
 	if file then
 		for k, v in pairs(json.decode(file:read("*all")) or {}) do
@@ -103,7 +145,11 @@ function NoobJoin:Load()
 	end
 end
 
+
 function NoobJoin:Save()
+	--[[	Function from Options.lua in R41
+		Saves file '_data_path'
+	]]
 	local file = io.open(NoobJoin._data_path, "w+")
 	if file then
 		file:write(json.encode(NoobJoin.settings))
@@ -111,40 +157,45 @@ function NoobJoin:Save()
 	end
 end
 
-local mpath=ModPath .. "loc/"
+
+-- load languages to options.txt in game
 Hooks:Add("LocalizationManagerPostInit", "LocalizationManagerPostInit_NoobJoinInitial", function(loc)
-	loc:load_localization_file(mpath.."initial.txt")
+	loc:load_localization_file(NoobJoin._loc_path .. "initial.txt")
 end)
+
+-- select language based on settings
 Hooks:Add("LocalizationManagerPostInit", "LocalizationManagerPostInit_NoobJoin", function(loc)
 	NoobJoin:Load()
-	local path
+	local lang="english"
 	if NoobJoin.settings.Noob_language == 1 then
-		path="english.txt"
-	elseif NoobJoin.settings.Noob_language == 2 then
-		path="french.txt"
+		lang="english"
+--[[	elseif NoobJoin.settings.Noob_language == 2 then
+		lang="french"
 	elseif NoobJoin.settings.Noob_language == 3 then
-		path="russian.txt"
+		lang="russian"
 	elseif NoobJoin.settings.Noob_language == 4 then
-		path="german.txt"
+		lang="german"
 	elseif NoobJoin.settings.Noob_language == 5 then
-		path="italian.txt"
+		lang="italian"
 	elseif NoobJoin.settings.Noob_language == 6 then
-		path="dutch.txt"
+		lang="dutch"
 	elseif NoobJoin.settings.Noob_language == 7 then
-		path="spanish.txt"
+		lang="spanish"
 	elseif NoobJoin.settings.Noob_language == 8 then
-		path="turkish.txt"
+		lang="turkish"
 	elseif NoobJoin.settings.Noob_language == 9 then
-		path="chinese.txt"
+		lang="chinese"
 	elseif NoobJoin.settings.Noob_language == 10 then
-		path="czech.txt"
+		lang="czech"
+]]
 	end
-	loc:load_localization_file(mpath..path)
+	loc:load_localization_file(NoobJoin._loc_path .. lang .. ".txt")
 end)
+
 
 Hooks:Add("MenuManagerInitialize", "MenuManagerInitialize_NoobJoin", function(menu_manager)
 	NoobJoin.Toggle = function(self)
-		if Network:is_server() and NoobJoin:inChat() == false and Global.game_settings.difficulty == "overkill_290" or Global.game_settings.difficulty == "overkill_145" then
+		if Network:is_server() and NoobJoin:inChat() == false and Global.game_settings.difficulty == "overkill_290" or Global.game_settings.difficulty == "overkill_145" or Global.game_settings.difficulty == "overkill" then
 			if NoobJoin.settings.Toggle == 1 then
 				NoobJoin.settings.Toggle = 0
 				NoobJoin:Save()
@@ -205,10 +256,15 @@ Hooks:Add("MenuManagerInitialize", "MenuManagerInitialize_NoobJoin", function(me
 	
 	NoobJoin.SkillInfo = function(self)
 		if managers.network:session() then
+		-- why two calls?
+			-- first call is local call, does not display your info without it
 			NoobJoin:Information_To_HUD(managers.network:session():peer(_G.LuaNetworking:LocalPeerID()))
+			-- there is no local peer in here
 			for _, peer in pairs(managers.network:session():peers()) do
 				NoobJoin:Information_To_HUD(peer)
 			end
+			-- from R41 - CHECK old style!
+			--managers.mission._fading_debug_output:script().log(NoobJoin.Name, Color(NoobJoin.Colors[2]))
 			NoobJoin:Debug_Message()
 		end
 	end
@@ -218,9 +274,9 @@ Hooks:Add("MenuManagerInitialize", "MenuManagerInitialize_NoobJoin", function(me
 			local menu_options = {}
 			for _, peer in pairs(managers.network:session():peers()) do
 				if peer:rank() and peer:level() then
-					menu_options[#menu_options+1] ={text = "(" .. peer:rank() .. "-" .. peer:level() .. ") " .. peer:name(), data = peer:id(), callback = Manual_Add_To_Blacklist}
+					menu_options[#menu_options+1] = {text = "(" .. peer:rank() .. "-" .. peer:level() .. ") " .. peer:name(), data = peer:id(), callback = Manual_Add_To_Blacklist}
 				else
-					menu_options[#menu_options+1] ={text = peer:name(), data = peer:id(), callback = Manual_Add_To_Blacklist}
+					menu_options[#menu_options+1] = {text = peer:name(), data = peer:id(), callback = Manual_Add_To_Blacklist}
 				end
 			end
 			menu_options[#menu_options+1] = {text = managers.localization:text("dialog_cancel"), is_cancel_button = true}
@@ -248,7 +304,11 @@ Hooks:Add("MenuManagerInitialize", "MenuManagerInitialize_NoobJoin", function(me
 	end
 	
 	-- Create buttons
-	
+	-- UNM whitelist
+	MenuCallbackHandler.friend_whitelist_cb = function(this, item)
+		NoobJoin.settings.friend_whitelist_val = (item:value() == "on" and true or false)
+		NoobJoin:Save()
+	end
 	MenuCallbackHandler.ngbto_language_cb = function(this, item)
 		NoobJoin.settings.Noob_language = item:value()
 		NoobJoin:Save()
@@ -267,6 +327,14 @@ Hooks:Add("MenuManagerInitialize", "MenuManagerInitialize_NoobJoin", function(me
 	end
 	MenuCallbackHandler.min_hours_stealth_ovk = function(this, item)
 		NoobJoin.settings.min_hours_stealth_ovk_val = item:value()
+		NoobJoin:Save()
+	end
+	MenuCallbackHandler.min_hours_loud_vh = function(this, item)
+		NoobJoin.settings.min_hours_loud_vh_val = math.floor(item:value())
+		NoobJoin:Save()
+	end
+	MenuCallbackHandler.min_hours_stealth_vh = function(this, item)
+		NoobJoin.settings.min_hours_stealth_vh_val = math.floor(item:value())
 		NoobJoin:Save()
 	end
 	MenuCallbackHandler.kickhidden_dw = function(this, item)
@@ -470,8 +538,9 @@ Hooks:Add("MenuManagerInitialize", "MenuManagerInitialize_NoobJoin", function(me
 end)
 
 -- Information about mod settings
-
 Hooks:PostHook(MenuCallbackHandler, "start_job", "NoobJoin:ContractBuy", function(self, job_data)
+	--[[	Hook from MenuManager.lua in R41
+	]]
 	if not Global.game_settings.job_plan then
 		Global.game_settings.job_plan = -1
 	end
@@ -539,29 +608,38 @@ Hooks:PostHook(MenuCallbackHandler, "start_job", "NoobJoin:ContractBuy", functio
 	end)
 end)
 
+------------------------------| Copied from UNM
 function NoobJoin:Is_Friend(user_id)
-	local istfriend = false
+-- Checks whether user_id is a friend on Steam
+------------------------------------------------------------------------
+-- user_id:	steam64 user ID
+	local is_friend = false
 	if Steam:logged_on() then
 		for _, friend in ipairs(Steam:friends() or {}) do
 			if friend:id() == user_id then
-				istfriend = true
+				is_friend = true
 				break
 			end
 		end
 	end
-	return istfriend
+	return is_friend
 end
-
+------------------------------| CHECK: new in R54
 function Manual_Add_To_Blacklist(id)
+-- Bans user manually, adds to blacklist, kicks from lobby
+------------------------------------------------------------------------
+-- id:	peer ID
 	local peer = managers.network._session:peer(id)
 	if peer then
-		NoobJoin:Message_Receive(peer:name() .. " " .. managers.localization:text("manually_added_to_blacklist") .. " " , 1)
+		NoobJoin:Message_Receive(peer:name() .. " " .. managers.localization:text("manually_added_to_blacklist"), "kick")
 		NoobJoin:Add_Cheater(peer:user_id(), peer:name(), "Manual ban")
 		NoobJoin:Kick_Selected_Peer(id)
-		
 	end
 end
-
+------------------------------| CHECK: new in R54
+-- Performs some inspect?
+------------------------------------------------------------------------
+-- id:	peer ID
 function NGBTO_player_inspect(id)
 	local peer = managers.network._session:peer(id)
 	if peer then
@@ -678,7 +756,10 @@ function NGBTO_player_inspect(id)
 		end)
 	end
 end
-
+------------------------------| CHECK: new in R54
+-- Performs some inspect?
+------------------------------------------------------------------------
+-- data:	???
 function NGBTO_player_http(data)
 	local peer = managers.network._session:peer(data[2])
 	if peer then
@@ -696,7 +777,18 @@ function NGBTO_player_http(data)
 		NoobJoin:NGBTO_player_inspection(data[2], data[3])
 	end
 end
-
+------------------------------| CHECK: new in R54
+-- Performs some inspect?
+------------------------------------------------------------------------
+-- id:		peer ID
+-- hours:	???
+-- vac:		vac string
+-- achievements:	???
+-- pd2cheat:	???
+-- skill:	???
+-- p:		???
+-- perk_deck_completion:	???
+-- outfit:	???
 function NoobJoin:NGBTO_player_data(id, hours, vac, achievements, pd2cheat, skill, p, perk_deck_completion, outfit)
 	local peer = managers.network._session:peer(id)
 	if peer then
@@ -727,7 +819,11 @@ function NoobJoin:NGBTO_player_data(id, hours, vac, achievements, pd2cheat, skil
 		NoobJoin:NGBTO_player_inspection(id, message)
 	end
 end
-
+------------------------------| CHECK: new in R54
+-- Sends message?
+------------------------------------------------------------------------
+-- id:		peer ID
+-- message:	???
 function NoobJoin:NGBTO_player_inspection(id, message)
 	local peer = managers.network._session:peer(id)
 	if peer then
@@ -748,112 +844,172 @@ function NoobJoin:NGBTO_player_inspection(id, message)
 		menu:Show()
 	end
 end
-
+------------------------------| Copied from UNM-R41
 function NoobJoin:inChat()
+-- Checks whether focus is in chat
+-- TODO: join the statements, get rid of local var
 	local value = false
-	if managers.hud ~= nil and managers.hud._chat_focus == true then
+	if managers.hud and managers.hud._chat_focus == true then
 		value = true
 	end
-	if managers.menu_component ~= nil and managers.menu_component._game_chat_gui ~= nil and managers.menu_component._game_chat_gui:input_focus() == true then
+	if managers.menu_component and managers.menu_component._game_chat_gui and managers.menu_component._game_chat_gui:input_focus() == true then
 		value = true
 	end
 	return value
 end
-
+------------------------------| Copied from UNM-R41
 function NoobJoin:Delayed_Message(message)
+-- Posts message in chat if lobby host. CHECK why delayed.
+------------------------------------------------------------------------
+-- message:	text to send
 	if Network:is_server() and NoobJoin.settings.broadcastinfo_val == true then
 		for i=2,4 do
-			local peer2 = managers.network:session() and managers.network:session():peer(i)
-			if peer2 then
-				peer2:send("send_chat_message", ChatManager.GAME, NoobJoin.Prefix .. ": " .. message)
+			local player = managers.network:session() and managers.network:session():peer(i)
+			if player then
+				player:send("send_chat_message", ChatManager.GAME, NoobJoin.Prefix .. ": " .. message)
 			end
 		end
 	end
 end
-
+------------------------------| Copied from UNM-R41
 function NoobJoin:Deployables_Lookup(peer_id)
+-- Checks equipped deployables and kicks based on settings
+------------------------------------------------------------------------
+-- peer_id:	??? peer's ID in lobby? Like 2, 3 or 4?
 	if Utils:IsInHeist() and NoobJoin.settings.Toggle == 1 then
 		if managers.network:session():peer(peer_id) then
+			-- shortcut variable
 			local peer = managers.network:session():peer(peer_id)
-			if managers.network:session():peer(peer_id):waiting_for_player_ready() == true then
+			if peer:waiting_for_player_ready() == true then
 				NoobJoin:Join_Message(peer_id)
 				local split = string.split(peer:profile().outfit_string, " ") or {}
-				local kick = false
-				local message = peer:name() .. " " .. managers.localization:text("perk_deck_kick_1") .. " " .. managers.localization:text("that_one_string") .. " "
-				split[12] = tonumber(split[12])
+				local prefix = peer:name() .. " " .. managers.localization:text("perk_deck_kick_1") .. " "
+				local deploy = nil
+				local armor = nil
+				local message = nil
+				
+				split[12] = tonumber(split[12]) -- convert to # of deployables
+				-- 0 deployables
 				if split[12] == 0 and NoobJoin.settings.noequipment == true then
-					message = message .. managers.localization:text("no_deployable_kick") .. " "
-					kick = true
+					deploy = managers.localization:text("no_deployable_kick")
+				-- 1 sentry gun
 				elseif split[11] == "sentry_gun" and split[12] == 1 and NoobJoin.settings.singleturret == true then
-					message = message .. managers.localization:text("debug_sentry_gun") .. " "
-					kick = true
+					deploy = managers.localization:text("kick_only_count") .. " 1 " .. managers.localization:text("debug_sentry_gun")
+				-- bodybags
 				elseif split[11] == "bodybags_bag" and NoobJoin.settings.bodybags == true then
-					message = message .. managers.localization:text("debug_equipment_bodybags_bag") .. " "
-					kick = true
-				elseif split[11] == "armor_kit" and split[12] == 1 and NoobJoin.settings.armorkit == true then
-					message = message .. managers.localization:text("debug_equipment_armor_kit") .. " "
-					kick = true
+					deploy = managers.localization:text("debug_equipment_bodybags_bag")
+				-- armorkit
+				elseif split[11] == "armor_kit" and NoobJoin.settings.armorkit == true then
+					deploy = managers.localization:text("debug_equipment_armor_kit")
+				-- 1 ecm
 				elseif split[11] == "ecm_jammer" and split[12] == 1 and NoobJoin.settings.singleecm == true then
-					message = message .. managers.localization:text("debug_equipment_ecm_jammer") .. " "
-					kick = true
+					deploy = managers.localization:text("kick_only_count") .. " 1 " .. managers.localization:text("debug_equipment_ecm_jammer")
+				-- 4 first aid kits
 				elseif split[11] == "first_aid_kit" and split[12] == 4 and NoobJoin.settings.fourfaks == true then
-					message = message .. managers.localization:text("debug_equipment_first_aid_kit") .. " 4" .. " "
-					kick = true
+					deploy = managers.localization:text("kick_only_count") .. " 4 " .. managers.localization:text("debug_equipment_first_aid_kit")
 				end
-				if split[5] ~= nil then
+				
+				if split[5] then
 					split[5] = string.sub(split[5], 1, 7)
+					if split[5] == "level_1" and NoobJoin.settings.armor1 == true then
+						armor = managers.localization:text("bm_armor_level_1")
+					elseif split[5] == "level_2" and NoobJoin.settings.armor2 == true then
+						armor = managers.localization:text("bm_armor_level_2")
+					elseif split[5] == "level_3" and NoobJoin.settings.armor3 == true then
+						armor = managers.localization:text("bm_armor_level_3")
+					elseif split[5] == "level_4" and NoobJoin.settings.armor4 == true then
+						armor = managers.localization:text("bm_armor_level_4")
+					elseif split[5] == "level_5" and NoobJoin.settings.armor5 == true then
+						armor = managers.localization:text("bm_armor_level_5")
+					elseif split[5] == "level_6" and NoobJoin.settings.armor6 == true then
+						armor = managers.localization:text("bm_armor_level_6")
+					elseif split[5] == "level_7" and NoobJoin.settings.armor7 == true then
+						armor = managers.localization:text("bm_armor_level_7")
+					end
 				end
-				if split[5] == "level_1" and NoobJoin.settings.armor1 == true then
-					message = message .. managers.localization:text("bm_armor_level_1") .. " "
-					kick = true
-				elseif split[5] == "level_2" and NoobJoin.settings.armor2 == true then
-					message = message .. managers.localization:text("bm_armor_level_2") .. " "
-					kick = true
-				elseif split[5] == "level_3" and NoobJoin.settings.armor3 == true then
-					message = message .. managers.localization:text("bm_armor_level_3") .. " "
-					kick = true
-				elseif split[5] == "level_4" and NoobJoin.settings.armor4 == true then
-					message = message .. managers.localization:text("bm_armor_level_4") .. " "
-					kick = true
-				elseif split[5] == "level_5" and NoobJoin.settings.armor5 == true then
-					message = message .. managers.localization:text("bm_armor_level_5") .. " "
-					kick = true
-				elseif split[5] == "level_6" and NoobJoin.settings.armor6 == true then
-					message = message .. managers.localization:text("bm_armor_level_6") .. " "
-					kick = true
-				elseif split[5] == "level_7" and NoobJoin.settings.armor7 == true then
-					message = message .. managers.localization:text("bm_armor_level_7") .. " "
-					kick = true
+				
+				if deploy then -- we kick by deploy first
+					message = deploy
+					if armor then -- and we have armor kick in place
+						message = message .. " and for using " .. armor
+					end
+				elseif armor then -- no deploy, armor kick
+					message = armor
 				end
-				if kick == true then
+				
+				if message then
+					message = prefix .. message
+					NoobJoin:Message_Receive(message, "kick")
 					NoobJoin:Kick_Selected_Peer(peer_id)
-					NoobJoin:Message_Receive(message, 1)
 				end
 			end
 		end
 	end
 end
-
+------------------------------| Copied from UNM-R41
 function NoobJoin:Message_Receive(message, color)
+-- Host receives message with given color, other peers receive simple message
+------------------------------------------------------------------------
+-- message:	text to send
+-- color:	color ID/key in NoobJoin.Colors table
 	managers.chat:_receive_message(1, NoobJoin.Prefix, message, Color(NoobJoin.Colors[color]))
 	NoobJoin:Delayed_Message(message)
 end
-
+------------------------------| New in UNM-R41
+function NoobJoin:is_from_whitelist(user_id)
+-- Check ider_id versus whitelist table
+------------------------------------------------------------------------
+-- user_id:	steam64 user ID
+	local is_wl = false
+	for _,line in pairs(NoobJoin.whitelist) do
+		if line == user_id then
+			is_wl = true
+			break
+		end
+	end
+	return is_wl
+end
+------------------------------| Copied from UNM-R41
 function NoobJoin:Lookup_Player_Is_Friend(peer_id, user_id)
-	if NoobJoin:Is_Friend(user_id) == false then
-		NoobJoin:Return_Playtime(peer_id, user_id)
-		if user_id == "76561198043661340" then
-			managers.chat:_receive_message(1, NoobJoin.Prefix, "Hello there, could you tell me if there are any bugs with the current build of NGBTO? -FishTaco", Color(NoobJoin.Colors[3]))
+-- Ckeck player hours
+-- Skip checks if player is a friend and whitelist is enabled for friends
+------------------------------------------------------------------------
+-- peer_id:	???
+-- user_id:	steam64 user ID
+	local peer = managers.network:session():peer(peer_id)
+	if NoobJoin:is_from_whitelist(user_id) == false then
+		-- general user logic
+		if NoobJoin:Is_Friend(user_id) == true then
+			local message = peer:name() .. " " .. managers.localization:text("player_friendlist")
+			NoobJoin:Message_Receive(message, "whitelist")
+			-- check versus whitelisting of friends
+			if NoobJoin.settings.friend_whitelist_val == true then
+				-- skip checks
+				local message = peer:name() .. " (temporary) " .. managers.localization:text("player_whitelist")
+				NoobJoin:Message_Receive(message, "whitelist")
+				NoobJoin:Wait_For_Skills_Lookup(peer_id, false, false)
+			else
+				NoobJoin:Return_Playtime(peer_id, user_id)
+			end
+		else
+			NoobJoin:Return_Playtime(peer_id, user_id)
 		end
 	else
-		local peer = managers.network:session():peer(peer_id)
-		local message = peer:name() .. " " .. managers.localization:text("player_whitelist") .. " "
+		-- whitelisted explicitly
+		local message = peer:name() .. " " .. managers.localization:text("player_whitelist")
+		NoobJoin:Message_Receive(message, "whitelist")
 		NoobJoin:Wait_For_Skills_Lookup(peer_id, false, false)
-		NoobJoin:Message_Receive(message, 3)
 	end
 end
 
+------------------------------| Copied from UNM-R41
 function NoobJoin:Hours_Compare(current, peer_id, user_id)
+-- Get hours from steam and compare with settings
+-- TODO: cleanup
+------------------------------------------------------------------------
+-- current:	hours in profile
+-- peer_id:	???
+-- user_id:	steam64 user ID
 	local hours = NoobJoin:Return_Minimum_Hours()
 	local block = NoobJoin:Is_From_Blacklist(user_id)
 	local peer = managers.network:session():peer(peer_id)
@@ -862,156 +1018,190 @@ function NoobJoin:Hours_Compare(current, peer_id, user_id)
 	local iskicked = false
 	local infamy = false
 	local hiddenprofile = false
+
 	if current == nil then
 		hiddenprofile = true
 	end
+	
 	if block == true then
-		message = message .. " " .. managers.localization:text("player_blacklist") .. " "
+		message = peer:name() .. " " .. managers.localization:text("player_blacklist")
 		NoobJoin:Kick_Selected_Peer(peer_id)
 		kick = true
 		iskicked = true
-	end
-	if hours ~= -1 and block == false then
-		if current == nil and NoobJoin.settings.kickhidden_val == true then
-			if NoobJoin.settings.Toggle == 1 then
-				if NoobJoin.settings.hiddeninfamycheck == false then
-					message = message .. " " .. managers.localization:text("player_was_hidden") .. " "
+	else
+		message = peer:name() .. " " .. managers.localization:text("hours_joined_1") .. " " .. tostring(current) .. " " .. managers.localization:text("hours_joined_2")
+		if hours ~= -1 then
+			if current == nil then
+				message = peer:name() .. " " .. managers.localization:text("player_is_hidden")
+				if NoobJoin.settings.kickhidden_val == true then
+					if NoobJoin.settings.Toggle == 1 then
+						if NoobJoin.settings.hiddeninfamycheck == false then
+							message = peer:name() .. " " .. managers.localization:text("player_was_hidden")
+							NoobJoin:Kick_Selected_Peer(peer_id)
+							kick = true
+							iskicked = true
+						else
+							infamy = true
+						end
+					else
+						kick = true
+					end
+				end
+			elseif current < hours then
+				if NoobJoin.settings.Toggle == 1 then
+					message = peer:name() .. " " .. managers.localization:text("hours_kicked_1") .. " " .. current .. "/" .. hours .. " " .. managers.localization:text("hours_kicked_2") .. " "
 					NoobJoin:Kick_Selected_Peer(peer_id)
 					kick = true
 					iskicked = true
 				else
-					message = message .. " " .. managers.localization:text("player_is_hidden") .. " "
-					infamy = true
+					--message = message .. " " .. managers.localization:text("hours_joined_1") .. " " .. current .. " " .. managers.localization:text("hours_joined_2") .. " "
+					kick = true
 				end
-			else
-				message = message .. " " .. managers.localization:text("player_is_hidden") .. " "
-				kick = true
-				iskicked = false
+			--elseif current >= hours then
+			--	message = message .. " " .. managers.localization:text("hours_joined_1") .. " " .. current .. " " .. managers.localization:text("hours_joined_2") .. " "
 			end
-		elseif current == nil and NoobJoin.settings.kickhidden_val == false then
-			message = peer:name() .. " " .. managers.localization:text("player_is_hidden") .. " "
-		elseif current < hours then
-			if NoobJoin.settings.Toggle == 1 then
-				message = message .. " " .. managers.localization:text("hours_kicked_1") .. " " .. current .. "/" .. hours .. " " .. managers.localization:text("hours_kicked_2") .. " "
-				NoobJoin:Kick_Selected_Peer(peer_id)
-				kick = true
-				iskicked = true
-			else
-				message = message .. " " .. managers.localization:text("hours_joined_1") .. " " .. current .. " " .. managers.localization:text("hours_joined_2") .. " "
-				kick = true
-				iskicked = false
-			end
-		elseif current >= hours then
-			message = message .. " " .. managers.localization:text("hours_joined_1") .. " " .. current .. " " .. managers.localization:text("hours_joined_2") .. " "
-		end
-	elseif hours == -1 then
-		if current == nil then
-			message = message .. " " .. managers.localization:text("player_is_hidden") .. " "
 		else
-			message = message .. " " .. managers.localization:text("hours_joined_1") .. " " .. current .. " " .. managers.localization:text("hours_joined_2") .. " "
+			if current == nil then
+				message = peer:name() .. " " .. managers.localization:text("player_is_hidden")
+			--else
+			--	message = message .. " " .. managers.localization:text("hours_joined_1") .. " " .. current .. " " .. managers.localization:text("hours_joined_2") .. " "
+			end
 		end
 	end
-	if kick == true and iskicked == false then
-		NoobJoin:Message_Receive(message, 1)
-		NoobJoin:Wait_For_Skills_Lookup(peer_id, block, infamy, hiddenprofile)
-	elseif kick == false and iskicked == false then
-		NoobJoin:Message_Receive(message, 2)
-		if hours ~= -1 then
-			if NoobJoin.settings.deathwish_count_enable == true and Global.game_settings.difficulty == "overkill_290" or NoobJoin.settings.total_count_enable == true then
-				NoobJoin:Heists_Completed(user_id, peer_id)
-			end
+	
+	if iskicked == false then
+		if kick == true then
+			-- not toggled kicking, just the message and lookup
+			NoobJoin:Message_Receive(message, "kick")
 			NoobJoin:Wait_For_Skills_Lookup(peer_id, block, infamy, hiddenprofile)
 		else
-			NoobJoin:Wait_For_Skills_Lookup(peer_id, block, false, false)
+			-- he's ok, info and lookup
+			NoobJoin:Message_Receive(message, "info")
+			if hours ~= -1 then
+				-- CHECK: probably bad logic, using both DW counter and total counts
+				if NoobJoin.settings.deathwish_count_enable == true and Global.game_settings.difficulty == "overkill_290" or NoobJoin.settings.total_count_enable == true then
+					-- async inside + check for toggle
+					-- also does not deal with hidden profiles, just bypasses it as if everything is ok
+					NoobJoin:Heists_Completed(user_id, peer_id)
+				end
+				NoobJoin:Wait_For_Skills_Lookup(peer_id, block, infamy, hiddenprofile)
+			else
+				NoobJoin:Wait_For_Skills_Lookup(peer_id, block, false, false)
+			end
 		end
-	else
-		NoobJoin:Message_Receive(message, 1)
+	else	-- was kicked already
+		NoobJoin:Message_Receive(message, "kick")
 	end
 end
-
+------------------------------| Copied from UNM-R41 with bugfix
 function NoobJoin:Join_Message(peer_id)
+-- Displays message for joined peers
+------------------------------------------------------------------------
+-- peer_id:	??? peer's ID in lobby? Like 2, 3 or 4?
 	local hours = NoobJoin:Return_Minimum_Hours()
 	local peer = managers.network:session():peer(peer_id)
 	if NoobJoin.settings.broadcastinfo_val == true and NoobJoin.settings.Toggle == 1 then
-		DelayedCalls:Add("NoobJoin:Delayed_Message" .. tostring(peer_id), 2, function()
+		DelayedCalls:Add("send_message_to_" .. tostring(peer_id), 2, function()
+			local prefix = NoobJoin.Prefix .. ": "
 			local hidden = ""
-			local message = NoobJoin.Prefix .. ": "
+			local message = ""
+			local intro = prefix .. managers.localization:text("unm_join_description")
 			if NoobJoin.settings.localised_message == true then
 				if hours == 0 then
-					message = message .. managers.localization:text("lobby_not_supported") .. ". "
+					message = prefix .. managers.localization:text("lobby_not_supported")
 					if NoobJoin.settings.kickhidden_val == true then
-						message = message .. managers.localization:text("hidden_kick_on") .. "."
+						message = prefix .. managers.localization:text("hidden_kick_on")
 					end
 				elseif hours ~= -1 then
 					if NoobJoin.settings.kickhidden_val == true then
 						hidden = managers.localization:text("lobby_create_message_2") .. " "
 					end
-					message = message .. managers.localization:text("lobby_create_message_1") .. " " .. hidden .. managers.localization:text("lobby_create_message_3") .. " " .. hours .. " " .. managers.localization:text("lobby_create_message_4")
+					message = prefix .. managers.localization:text("lobby_create_message_1") .. " " .. hidden .. managers.localization:text("lobby_create_message_3") .. " " .. hours .. " " .. managers.localization:text("lobby_create_message_4")
 				else
-					message = message .. managers.localization:text("lobby_not_supported") .. "."
+					message = prefix .. managers.localization:text("lobby_not_supported")
 				end
 			else
 				if hours == 0 then
-					message = message .. "This lobby will print information about joining people and ban cheaters automatically."
+					message = prefix .. "This lobby will print information about joining people and ban cheaters automatically."
 					if NoobJoin.settings.kickhidden_val == true then
-						message = message .. "Hidden profiles will be kicked."
+						message = prefix .. "Hidden profiles will be kicked."
 					end
 				elseif hours ~= -1 then
 					if NoobJoin.settings.kickhidden_val == true then
 						hidden = "hidden profiles and "
 					end
-					message = message .. "This lobby will auto kick " .. hidden .. "players with under " .. hours .. " hours total playtime from the game."
+					message = prefix .. "This lobby will auto kick " .. hidden .. "players with under " .. hours .. " hours total playtime from the game."
 				else
-					message = message .. "This lobby will print information about joining people and ban cheaters automatically."
+					message = prefix .. "This lobby will print information about joining people and ban cheaters automatically."
 				end
 			end
+			
 			local peer2 = managers.network:session() and managers.network:session():peer(peer_id)
 			if peer2 then
+				peer2:send("send_chat_message", ChatManager.GAME, intro)
 				peer2:send("send_chat_message", ChatManager.GAME, message)
 			end
 		end)
 	end
 end
-
+------------------------------| Merged with UNM-R41, new Skill_cheater function
 function NoobJoin:Wait_For_Skills_Lookup(peer_id, block, infamy, hiddenprofile)
+-- 
+------------------------------------------------------------------------
+-- peer_id:	??? peer's ID in lobby? Like 2, 3 or 4?
+-- block:	is from blacklist (true/false)
+-- infamy:	infamy check should be performed (true/false)
+-- hiddenprofile:	passed to Skills_And_Perk_Deck()
 	DelayedCalls:Add("DelayedInspect" .. tostring(peer_id), 1 , function()
 		if managers.network:session() and managers.network:session():peers() then
 			local peer = managers.network:session():peer(peer_id) or {}
-			local ispresent = false
-			for id, ply in pairs(_G.LuaNetworking:GetPeers()) do
+			local is_present = false
+			
+			for id, _ in pairs(_G.LuaNetworking:GetPeers()) do
 				if id == peer_id then
-					ispresent = true
+					is_present = true
 					break
 				end
 			end
-			if peer and ispresent == true then
+			
+			if peer and is_present == true then
 				if peer:skills() then
 					if peer:skills() ~= nil then
-						local cheater = false
-						local number = 0
-						local sum = 0
 						local skills_perk_deck_info = string.split(peer:skills(), "-") or {}
 						local skills = string.split(skills_perk_deck_info[1], "_")
-						cheater = NoobJoin:Skill_cheater(skills, peer)
 						local perk_deck = string.split(skills_perk_deck_info[2], "_")
+						local cheater = NoobJoin:Skill_cheater(skills, peer)
 						if cheater == true and block == false then
+							-- adding but not kicking?
 							NoobJoin:Add_Cheater(peer:user_id(), peer:name(), "Using too many skill points")
+							--message = peer:name() .. " " .. managers.localization:text("cheater_ban") .. " "
+							--kick!
 						end
+						
 						NoobJoin:Skills_And_Perk_Deck(cheater, perk_deck[1], perk_deck[2], skills, peer_id, infamy, true, hiddenprofile)
-					else
+					else	-- call again until skills are present
 						NoobJoin:Wait_For_Skills_Lookup(peer_id, block, infamy, hiddenprofile)
 					end
-				else
+				else	-- call again until skills are present (but why the second time?)
 					NoobJoin:Wait_For_Skills_Lookup(peer_id, block, infamy, hiddenprofile)
 				end
 			end
 		end
 	end)
 end
-
+------------------------------| Changed in R54
 function NoobJoin:Information_To_HUD(peer)
-	if peer ~= nil then
+-- Actually NOT printing any information to hud. Composing message and adding 
+-- to NoobJoin.Players table. Then it will go to HUD (CHECK where)
+-- TODO: almost fully duplicates Skills_And_Perk_Deck(), so... new fucntion needed.
+------------------------------------------------------------------------
+-- peer:	??? not ID, but peer class?
+	--if peer ~= nil then
+	if peer then
 		if peer:is_outfit_loaded() then
+		--[[
+			-- peer:skills() format: 0_0_28_1_24_1_0_7_6_0_3_0_28_0_1-13_9
+			-- sometimes is absent (all nulls): 0_0_0_0_0_0_0_0_0_0_0_0_0_0_0-11_9
 			local skills_perk_deck_info = string.split(peer:skills(), "-") or {}
 			if #skills_perk_deck_info == 2 then
 				local skills = string.split(skills_perk_deck_info[1], "_")
@@ -1020,6 +1210,8 @@ function NoobJoin:Information_To_HUD(peer)
 				local sk = {}
 				local number = 0
 				local sum = 0
+				local message = peer:name() .. ": "
+				local perk_suffix = p .. " " .. perk_deck[2] .. "/9"
 				for i=1,#skills do
 					number = tonumber(skills[i])
 					sum = sum + number
@@ -1028,20 +1220,69 @@ function NoobJoin:Information_To_HUD(peer)
 					end
 					table.insert(sk, number)
 				end
-				local message = ""
-				if sum == 0 then
-					message = peer:name() .. " " .. p .. " " .. perk_deck[2] .. "/" .. "9"
+				if sum ~= 0 then
+					message = message .. "|" .. sk[1] .. ":" .. sk[2] .. ":" .. sk[3] .. " -"
+					message = message .. " " .. sk[4] .. ":" .. sk[5] .. ":" .. sk[6] .. " -"
+					message = message .. " " .. sk[7] .. ":" .. sk[8] .. ":" .. sk[9] .. " -"
+					message = message .. " " .. sk[10] .. ":" .. sk[11] .. ":" .. sk[12] .. " -"
+					message = message .. " " .. sk[13] .. ":" .. sk[14] .. ":" .. sk[15] .. "| "
+					message = message .. perk_suffix
 				else
-					message = peer:name() .. " M(" .. sk[1] .. ":" .. sk[2] .. ":" .. sk[3] .. ") E(" .. sk[4] .. ":" .. sk[5] .. ":" .. sk[6] .. ") T(" .. sk[7] .. ":" .. sk[8] .. ":" .. sk[9] .. ") G(" .. sk[10] .. ":" .. sk[11] .. ":" .. sk[12]  .. ") F(" .. sk[13] .. ":" .. sk[14] .. ":" .. sk[15] .. ") " .. p .. " " .. perk_deck[2] .. "/" .. "9"
+					-- something strange here: couldn't get skills?
+					message = message .. perk_suffix .. " (no skills?)"
 				end
 				NoobJoin.Players[peer:id()][3] = message
 			end
+			--]]
+			local message = NoobJoin:Compose_Skill_String(peer)
+			NoobJoin.Players[peer:id()][3] = message
 		end
 	end
 end
+------------------------------| Function for message draft
+function NoobJoin:Compose_Skill_String(peer)
+	local message = nil -- in case there is no message below
+	local skills_perk_deck_info = string.split(peer:skills(), "-") or {}
+	if #skills_perk_deck_info == 2 then
+		local skills = string.split(skills_perk_deck_info[1], "_")
+		local perk_deck = string.split(skills_perk_deck_info[2], "_")
+		local p = managers.localization:text("menu_st_spec_" .. perk_deck[1])
+		local sk = {}
+		local number = 0
+		local sum = 0
+		message = peer:name() .. ": "
+		local perk_suffix = p .. " " .. perk_deck[2] .. "/9"
+		for i=1,#skills do
+			number = tonumber(skills[i])
+			sum = sum + number
+			if number < 10 then
+				number = "0" .. tostring(skills[i])
+			end
+			table.insert(sk, number)
+		end
+		if sum ~= 0 then
+			message = message .. "|" .. sk[1] .. ":" .. sk[2] .. ":" .. sk[3] .. " -"
+			message = message .. " " .. sk[4] .. ":" .. sk[5] .. ":" .. sk[6] .. " -"
+			message = message .. " " .. sk[7] .. ":" .. sk[8] .. ":" .. sk[9] .. " -"
+			message = message .. " " .. sk[10] .. ":" .. sk[11] .. ":" .. sk[12] .. " -"
+			message = message .. " " .. sk[13] .. ":" .. sk[14] .. ":" .. sk[15] .. "| "
+			message = message .. perk_suffix
+		else
+			-- something strange here: couldn't get skills?
+			message = message .. perk_suffix .. " (no skills?)"
+		end
+	end
+	return message
+end
 
+------------------------------| Changed in R54
+-- TODO: s var is not used
+-- CHECK: hiddenprofile - not used?
 function NoobJoin:Skills_And_Perk_Deck(cheater, perkdeck, completion, s, peer_id, infamy, joined, hiddenprofile)
 	local peer = managers.network:session():peer(peer_id)
+	local message = NoobJoin:Compose_Skill_String(peer)
+	log("MSG: " .. message)
+	--[[
 	local p = managers.localization:text("menu_st_spec_" .. perkdeck)
 	local sk = {}
 	local number = 0
@@ -1061,11 +1302,12 @@ function NoobJoin:Skills_And_Perk_Deck(cheater, perkdeck, completion, s, peer_id
 	else
 		message = peer:name() .. " M(" .. sk[1] .. ":" .. sk[2] .. ":" .. sk[3] .. ") E(" .. sk[4] .. ":" .. sk[5] .. ":" .. sk[6] .. ") T(" .. sk[7] .. ":" .. sk[8] .. ":" .. sk[9] .. ") G(" .. sk[10] .. ":" .. sk[11] .. ":" .. sk[12]  .. ") F(" .. sk[13] .. ":" .. sk[14] .. ":" .. sk[15] .. ") " .. p .. " " .. completion .. "/" .. "9"
 	end
+	--]]
 	if cheater == true then
 		message = peer:name() .. " " .. managers.localization:text("cheater_ban") .. " "
 	else
-		if Network:is_server() and NoobJoin:Is_Friend(peer:user_id()) == false and _G.LuaNetworking:LocalPeerID() ~= peer:id() and NoobJoin.settings.Toggle == 1 then
-			if Global.game_settings.difficulty == "overkill_145" or Global.game_settings.difficulty == "overkill_290" then
+		if Network:is_server() and (NoobJoin:Is_Friend(peer:user_id()) == false or NoobJoin.settings.friend_whitelist_val == false) and _G.LuaNetworking:LocalPeerID() ~= peer:id() and NoobJoin.settings.Toggle == 1 then
+			if Global.game_settings.difficulty == "overkill" or Global.game_settings.difficulty == "overkill_145" or Global.game_settings.difficulty == "overkill_290" then
 				perkdeck = tonumber(perkdeck)
 				if NoobJoin.settings.perkdeck_1_val == true and perkdeck == 1 then
 					kicked = true
@@ -1098,6 +1340,11 @@ function NoobJoin:Skills_And_Perk_Deck(cheater, perkdeck, completion, s, peer_id
 				elseif NoobJoin.settings.perkdeck_15_val == true and perkdeck == 15 then
 					kicked = true
 				end
+				
+				local infamy_lvl = tonumber(peer:rank())
+				local infamy_min = NoobJoin.settings.hiddeninfamy-1
+				local infamy_max = NoobJoin.settings.hiddeninfamymax-1
+					
 				if kicked == true then
 					message = peer:name() .. " " .. managers.localization:text("perk_deck_kick_1") .. " " .. p .. " " .. managers.localization:text("perk_deck_kick_2") .. " "
 				elseif NoobJoin.settings.perkdeck0_val == true and tonumber(completion) == 0 then
@@ -1106,11 +1353,11 @@ function NoobJoin:Skills_And_Perk_Deck(cheater, perkdeck, completion, s, peer_id
 				elseif NoobJoin.settings.incompletedeck == true and tonumber(completion) ~= 9 then
 					message = peer:name() .. " " .. managers.localization:text("incomplete_perk_deck_kick") .. " "
 					kicked = true
-				elseif infamy == true and tonumber(peer:rank()) < (NoobJoin.settings.hiddeninfamy-1) then
-					message = peer:name() .. " " .. managers.localization:text("perk_deck_kick_4") .. " "
+				elseif infamy == true and infamy_lvl < infamy_min then
+					message = peer:name() .. " " .. managers.localization:text("perk_deck_kick_4") .. ": " .. infamy_lvl .. "/" .. infamy_min
 					kicked = true
-				elseif infamy == true and tonumber(peer:rank()) > (NoobJoin.settings.hiddeninfamymax-1) then
-					message = peer:name() .. " " .. managers.localization:text("perk_deck_kick_5") .. " "
+				elseif infamy == true and infamy_lvl > infamy_max then
+					message = peer:name() .. " " .. managers.localization:text("perk_deck_kick_5") .. ": " .. infamy_lvl .. "/" .. infamy_max
 					kicked = true
 				elseif infamy == true and NoobJoin.settings.hiddenxxv == true and tonumber(peer:rank()) == 25 and tonumber(peer:level()) == 100 then
 					message = peer:name() .. " " .. managers.localization:text("infamyxxv_kick") .. " "
@@ -1122,29 +1369,33 @@ function NoobJoin:Skills_And_Perk_Deck(cheater, perkdeck, completion, s, peer_id
 			end
 		end
 	end
-	if cheater == false and kicked == false then
+	
+	if cheater == true or kicked == true then
+		NoobJoin:Kick_Selected_Peer(peer:id())
+		if NoobJoin.Players[peer_id][1] ~= true then
+			NoobJoin:Message_Receive(message, 1)
+			NoobJoin.Players[peer_id][1] = true
+		end
+	else
 		if NoobJoin.settings.show_perks_info_val == true then
-			if Network:is_server() and joined == true or Network:is_client() and Utils:IsInGameState() then
-				if NoobJoin.Players[peer_id][1] ~= true then
-					NoobJoin:Message_Receive(message, 2)
+			if (Network:is_server() and joined == true) or (Network:is_client() and Utils:IsInGameState()) then
+				if NoobJoin.Players[peer_id][1] ~= true then	-- no idea what that is...
+					NoobJoin:Message_Receive(message, "info")
 					NoobJoin.Players[peer_id][1] = true
 				end
-				if NoobJoin:Is_Friend(peer:user_id()) == false and Network:is_server() then
-					NoobJoin:PD2Stats_API_Check(peer:user_id(), peer_id, false)
+				
+				if Network:is_server() then
+					if NoobJoin:is_from_whitelist(peer:user_id()) == false then
+						if NoobJoin:Is_Friend(peer:user_id()) == true then
+							if NoobJoin.settings.friend_whitelist_val == false then
+								NoobJoin:PD2Stats_API_Check(peer:user_id(), peer_id, false)
+							end
+						else
+							NoobJoin:PD2Stats_API_Check(peer:user_id(), peer_id, false)
+						end
+					end
 				end
 			end
-		end
-	elseif cheater == true then
-		NoobJoin:Kick_Selected_Peer(peer:id())
-		if NoobJoin.Players[peer_id][1] ~= true then
-			NoobJoin:Message_Receive(message, 1)
-			NoobJoin.Players[peer_id][1] = true
-		end
-	elseif kicked == true then
-		NoobJoin:Kick_Selected_Peer(peer:id())
-		if NoobJoin.Players[peer_id][1] ~= true then
-			NoobJoin:Message_Receive(message, 1)
-			NoobJoin.Players[peer_id][1] = true
 		end
 	end
 end

@@ -236,8 +236,9 @@ Hooks:Add("MenuManagerInitialize", "MenuManagerInitialize_NoobJoin", function(me
 							message = "Cheated, too many skill points"
 						end
 						NoobJoin.settings.Toggle = 0
-						NoobJoin:Debug_Message(message, NoobJoin.Colors[1])
 						NoobJoin:Save()
+						-- FIX: if cheater == true, but cheater1 ~= true, we have empty message!
+						NoobJoin:Debug_Message(message, NoobJoin.Colors[1])
 					else
 						NoobJoin.settings.Toggle = 1
 						NoobJoin:Save()
@@ -594,8 +595,8 @@ Hooks:PostHook(MenuCallbackHandler, "start_job", "NoobJoin:ContractBuy", functio
 							hidden = managers.localization:text("lobby_create_message_2") .. " "
 						end
 						message = managers.localization:text("lobby_create_message_1") .. " " .. hidden .. managers.localization:text("lobby_create_message_3")
-						NoobJoin:Debug_Message(message, NoobJoin.Colors[3], hours .. " " .. managers.localization:text("lobby_create_message_4"))
-						
+						message = message .. " " .. hours .. " " .. managers.localization:text("lobby_create_message_4")
+						NoobJoin:Debug_Message(message, NoobJoin.Colors[3])
 					else
 						NoobJoin:Debug_Message(managers.localization:text("lobby_not_supported"), NoobJoin.Colors[3])
 					end
@@ -1193,54 +1194,21 @@ end
 function NoobJoin:Information_To_HUD(peer)
 -- Actually NOT printing any information to hud. Composing message and adding 
 -- to NoobJoin.Players table. Then it will go to HUD (CHECK where)
--- TODO: almost fully duplicates Skills_And_Perk_Deck(), so... new fucntion needed.
 ------------------------------------------------------------------------
 -- peer:	??? not ID, but peer class?
-	--if peer ~= nil then
 	if peer then
 		if peer:is_outfit_loaded() then
-		--[[
-			-- peer:skills() format: 0_0_28_1_24_1_0_7_6_0_3_0_28_0_1-13_9
-			-- sometimes is absent (all nulls): 0_0_0_0_0_0_0_0_0_0_0_0_0_0_0-11_9
-			local skills_perk_deck_info = string.split(peer:skills(), "-") or {}
-			if #skills_perk_deck_info == 2 then
-				local skills = string.split(skills_perk_deck_info[1], "_")
-				local perk_deck = string.split(skills_perk_deck_info[2], "_")
-				local p = managers.localization:text("menu_st_spec_" .. perk_deck[1])
-				local sk = {}
-				local number = 0
-				local sum = 0
-				local message = peer:name() .. ": "
-				local perk_suffix = p .. " " .. perk_deck[2] .. "/9"
-				for i=1,#skills do
-					number = tonumber(skills[i])
-					sum = sum + number
-					if number < 10 then
-						number = "0" .. tostring(skills[i])
-					end
-					table.insert(sk, number)
-				end
-				if sum ~= 0 then
-					message = message .. "|" .. sk[1] .. ":" .. sk[2] .. ":" .. sk[3] .. " -"
-					message = message .. " " .. sk[4] .. ":" .. sk[5] .. ":" .. sk[6] .. " -"
-					message = message .. " " .. sk[7] .. ":" .. sk[8] .. ":" .. sk[9] .. " -"
-					message = message .. " " .. sk[10] .. ":" .. sk[11] .. ":" .. sk[12] .. " -"
-					message = message .. " " .. sk[13] .. ":" .. sk[14] .. ":" .. sk[15] .. "| "
-					message = message .. perk_suffix
-				else
-					-- something strange here: couldn't get skills?
-					message = message .. perk_suffix .. " (no skills?)"
-				end
-				NoobJoin.Players[peer:id()][3] = message
-			end
-			--]]
 			local message = NoobJoin:Compose_Skill_String(peer)
 			NoobJoin.Players[peer:id()][3] = message
 		end
 	end
 end
-------------------------------| Function for message draft
+------------------------------| Function for message
 function NoobJoin:Compose_Skill_String(peer)
+	--[[
+	peer:skills() format: 0_0_28_1_24_1_0_7_6_0_3_0_28_0_1-13_9
+	sometimes is absent (all nulls): 0_0_0_0_0_0_0_0_0_0_0_0_0_0_0-11_9
+	--]]
 	local message = nil -- in case there is no message below
 	local skills_perk_deck_info = string.split(peer:skills(), "-") or {}
 	if #skills_perk_deck_info == 2 then
@@ -1261,11 +1229,11 @@ function NoobJoin:Compose_Skill_String(peer)
 			table.insert(sk, number)
 		end
 		if sum ~= 0 then
-			message = message .. "|" .. sk[1] .. ":" .. sk[2] .. ":" .. sk[3] .. " -"
-			message = message .. " " .. sk[4] .. ":" .. sk[5] .. ":" .. sk[6] .. " -"
-			message = message .. " " .. sk[7] .. ":" .. sk[8] .. ":" .. sk[9] .. " -"
-			message = message .. " " .. sk[10] .. ":" .. sk[11] .. ":" .. sk[12] .. " -"
-			message = message .. " " .. sk[13] .. ":" .. sk[14] .. ":" .. sk[15] .. "| "
+			message = message .. "|" .. sk[1] .. ":" .. sk[2] .. ":" .. sk[3] .. "-"
+			message = message .. "" .. sk[4] .. ":" .. sk[5] .. ":" .. sk[6] .. "-"
+			message = message .. "" .. sk[7] .. ":" .. sk[8] .. ":" .. sk[9] .. "-"
+			message = message .. "" .. sk[10] .. ":" .. sk[11] .. ":" .. sk[12] .. "-"
+			message = message .. "" .. sk[13] .. ":" .. sk[14] .. ":" .. sk[15] .. "| "
 			message = message .. perk_suffix
 		else
 			-- something strange here: couldn't get skills?
@@ -1281,28 +1249,6 @@ end
 function NoobJoin:Skills_And_Perk_Deck(cheater, perkdeck, completion, s, peer_id, infamy, joined, hiddenprofile)
 	local peer = managers.network:session():peer(peer_id)
 	local message = NoobJoin:Compose_Skill_String(peer)
-	log("MSG: " .. message)
-	--[[
-	local p = managers.localization:text("menu_st_spec_" .. perkdeck)
-	local sk = {}
-	local number = 0
-	local kicked = false
-	local sum = 0
-	for i=1,#s do
-		number = tonumber(s[i])
-		sum = sum + number
-		if number < 10 then
-			number = "0" .. tostring(s[i])
-		end
-		table.insert(sk, number)
-	end
-	local message = ""
-	if sum == 0 then
-		message = peer:name() .. " " .. p .. " " .. completion .. "/" .. "9"
-	else
-		message = peer:name() .. " M(" .. sk[1] .. ":" .. sk[2] .. ":" .. sk[3] .. ") E(" .. sk[4] .. ":" .. sk[5] .. ":" .. sk[6] .. ") T(" .. sk[7] .. ":" .. sk[8] .. ":" .. sk[9] .. ") G(" .. sk[10] .. ":" .. sk[11] .. ":" .. sk[12]  .. ") F(" .. sk[13] .. ":" .. sk[14] .. ":" .. sk[15] .. ") " .. p .. " " .. completion .. "/" .. "9"
-	end
-	--]]
 	if cheater == true then
 		message = peer:name() .. " " .. managers.localization:text("cheater_ban") .. " "
 	else
@@ -1535,7 +1481,7 @@ function NoobJoin:PD2Stats_API_Check(user_id, peer_id, joined)
 		end
 	end
 end
-
+------------------------------| Copied from UNM-R41
 function NoobJoin:Return_Minimum_Hours()
 	local hours = -1
 	if Global.game_settings.difficulty == "overkill_290" then
@@ -1549,6 +1495,12 @@ function NoobJoin:Return_Minimum_Hours()
 			hours = ((NoobJoin.settings.min_hours_loud_ovk_val * 20) - 20)
 		else
 			hours = ((NoobJoin.settings.min_hours_stealth_ovk_val * 20) - 20)
+		end
+	elseif Global.game_settings.difficulty == "overkill" then
+		if Global.game_settings.job_plan == -1 or Global.game_settings.job_plan == 1 then
+			hours = NoobJoin.settings.min_hours_loud_vh_val
+		else
+			hours = NoobJoin.settings.min_hours_stealth_vh_val
 		end
 	end
 	return hours

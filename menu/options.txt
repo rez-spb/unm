@@ -44,7 +44,7 @@
 			"description" : "NGBTO_language_desc",
 			"callback" : "ngbto_language_cb",
 			"items" : [
-				"NGBTO_language_1", "NGBTO_language_2", "NGBTO_language_3", "NGBTO_language_4", "NGBTO_language_5", "NGBTO_language_6", "NGBTO_language_7", "NGBTO_language_8", "NGBTO_language_9", "NGBTO_language_10"
+				"NGBTO_language_1"
 			],
 			"value" : "Noob_language",
 			"default_value" : 1,

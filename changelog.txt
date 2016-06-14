@@ -1,0 +1,14 @@
+===[v0.0.1]=====================================================================
+ + mod works on 'very hard' difficulty
+ + whitelist.ini is now present, uses the same config format as blacklist.ini
+ + added option to whitelist friends (ngbto default) or not (unm default)
+ + added infamy requirement in message (f.e. 'kicked for too low infamy: 0/1')
+ + this changelog that differs from ngbto one
+ ! changed skills display format to make it more brief
+ ! returned mod self-introduction to chat when game is already started (lost in
+   ngbto r54)
+ ! fixed several bugs (there are still plenty of them)
+ - [UNM-3] Drop all localization except English (messages will change 
+   frequently, but I have noone to do the translating, so no localizations for 
+   now)
+ - kicklist mod support (WL and BL formats will change in future)

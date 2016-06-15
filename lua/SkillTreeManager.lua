@@ -1,8 +1,7 @@
 function SkillTreeManager:pack_to_string()
 	local packed_string = ""
 	for tree, data in ipairs(tweak_data.skilltree.trees) do
-		local points, num_skills = managers.skilltree:get_tree_progress_new(tree)
-		--local points, num_skills = managers.skilltree:get_tree_progress(tree)
+		local points, owned, aced = managers.skilltree:get_tree_progress_new(tree)
 		packed_string = packed_string .. tostring(points)
 		if tree ~= #tweak_data.skilltree.trees then
 			packed_string = packed_string .. "_"

@@ -87,7 +87,7 @@ if not _G.NoobJoin then
 	local num_player_slots = BigLobbyGlobals and BigLobbyGlobals:num_player_slots() or 4
 	for i=1,num_player_slots do		-- peer info
 		NoobJoin.Players[i] = {}
-		for j=1,3 do			-- CHECK: 3 instead of 4? Really? Why?
+		for j=1,4 do			-- Skill printed, cheater, skills for overlay, join time
 			NoobJoin.Players[i][j] = 0
 		end
 	end
@@ -213,7 +213,6 @@ Hooks:Add("MenuManagerInitialize", "MenuManagerInitialize_NoobJoin", function(me
 					local cheater = false
 					local cheater1 = false
 					message = ""
-					--[[
 					for param, val in string.gmatch(page, "([%w_]+)=([%w_]+)") do
 						if string.len(val) > 17 then
 							reason = string.gsub(val, "_", " ")
@@ -225,7 +224,6 @@ Hooks:Add("MenuManagerInitialize", "MenuManagerInitialize_NoobJoin", function(me
 							end
 						end
 					end
-					--]]
 					local skills_perk_deck_info = string.split(peer:skills(), "-") or {}
 					if #skills_perk_deck_info == 2 then
 						local skills = string.split(skills_perk_deck_info[1], "_")
@@ -556,7 +554,6 @@ Hooks:PostHook(MenuCallbackHandler, "start_job", "NoobJoin:ContractBuy", functio
 				local number = 0
 				local sum = 0
 				local skillcheat = false
-				--[[
 				local peer = managers.network:session():peer(1)
 				for param, val in string.gmatch(page, "([%w_]+)=([%w_]+)") do
 					if string.len(val) > 17 then
@@ -567,7 +564,6 @@ Hooks:PostHook(MenuCallbackHandler, "start_job", "NoobJoin:ContractBuy", functio
 						end
 					end
 				end
-				--]]
 				local skills_perk_deck_info = string.split(peer:skills(), "-") or {}
 				if #skills_perk_deck_info == 2 then
 					local skills = string.split(skills_perk_deck_info[1], "_")
@@ -624,6 +620,29 @@ function NoobJoin:Is_Friend(user_id)
 		end
 	end
 	return is_friend
+end
+------------------------------| New in R55, merged with UNM
+function NoobJoin:Player_Announce(peer, bool)
+-- Sends message and initiates pd2stats api check if not whitelisted and
+-- not banned
+------------------------------------------------------------------------
+-- peer:	peer object
+-- bool:	passed to PD2Stats_API_Check() as true or false
+	if NoobJoin:is_from_whitelist(peer:user_id()) == true then
+		message = peer:name() .. " " .. managers.localization:text("player_whitelist")
+		NoobJoin:Message_Receive(message, "whitelist")
+	elseif NoobJoin:Is_From_Blacklist(peer:user_id()) == true then
+		message = peer:name() .. " " .. managers.localization:text("player_blacklist")
+		NoobJoin:Message_Receive(message, "kick")
+	elseif NoobJoin:Is_Friend(peer:user_id()) == true then
+		message = peer:name() .. " " .. managers.localization:text("player_friendlist")
+		NoobJoin:Message_Receive(message, "whitelist")
+		if NoobJoin.settings.friend_whitelist_val == false then
+			NoobJoin:PD2Stats_API_Check(peer:user_id(), peer:id(), bool)
+		end
+	else
+		NoobJoin:PD2Stats_API_Check(peer:user_id(), peer:id(), bool)
+	end
 end
 ------------------------------| CHECK: new in R54
 function Manual_Add_To_Blacklist(id)
@@ -1442,14 +1461,14 @@ end
 
 function NoobJoin:PD2Stats_API_Check(user_id, peer_id, joined)
 	if Global.game_settings.single_player == false then
-		if false then -- if NoobJoin.settings.usepd2statsanticheat == true then  -- |Shits broken, giving too many false positives|
+		if NoobJoin.settings.usepd2statsanticheat == true then
 			dohttpreq("http://api.pd2stats.com/cheater/v3/?type=saf&id=".. user_id .. "&force=1",
 			function(page)
 				local peer = managers.network:session():peer(peer_id)
 				local Ischeater = false
 				local IsNoobJoinastring = false
 				local reason = ""
-				if false then -- if NoobJoin.settings.usepd2statsanticheat == true then  -- |Shits broken, giving too many false positives|
+				if NoobJoin.settings.usepd2statsanticheat == true then
 					local message = peer:name() .. ": "
 					for param, val in string.gmatch(page, "([%w_]+)=([%w_]+)") do
 						if string.len(val) > 17 then
@@ -1474,10 +1493,10 @@ function NoobJoin:PD2Stats_API_Check(user_id, peer_id, joined)
 						end
 					end
 				end
-				if Network:is_client() and joined == true then
-					NoobJoin:Wait_For_Skills_Lookup(peer_id, false, false)
-				end
 			end)
+		end
+		if Network:is_client() and joined == true then
+			NoobJoin:Wait_For_Skills_Lookup(peer_id, false, false)
 		end
 	end
 end

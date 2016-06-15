@@ -1,4 +1,8 @@
 Modification made for Payday 2 by FishTaco
+---------------------- 3.26 R55 ----------------------
+Reenabled pd2stats.
+Fixed when you as a client don't get notifications about other people skills as they join.
+Added Kill per minute to statistics.
 ---------------------- 3.25 R54 ----------------------
 Updated the anti cheat for skills to work according the levels.
 Added the skill tree sharing to the mod, so now you will share your progression with others, well and you will see your own.

@@ -5,54 +5,27 @@ if RequiredScript == "lib/network/base/networkpeer" then
 		end
 	end)
 	Hooks:Add("NetworkManagerOnPeerAdded", "NoobJoin:PeerAdded", function(peer, peer_id)
-		--[[	Hook from BaseMod.lua in R41
-		]]
 		if Network:is_server() then
 			NoobJoin:Lookup_Player_Is_Friend(peer_id, peer:user_id())
 			if not Utils:IsInGameState() then
 				NoobJoin:Join_Message(peer_id)
 			end
-		elseif Network:is_client() then
-			local message
-			if NoobJoin:is_from_whitelist(peer:user_id()) == true then
-				message = peer:name() .. " " .. managers.localization:text("player_whitelist")
-				NoobJoin:Message_Receive(message, "whitelist")
-			elseif NoobJoin:Is_From_Blacklist(peer:user_id()) == true then
-				message = peer:name() .. " " .. managers.localization:text("player_blacklist")
-				NoobJoin:Message_Receive(message, "kick")
-			elseif NoobJoin:Is_Friend(peer:user_id()) == true then
-				message = peer:name() .. " " .. managers.localization:text("player_friendlist")
-				NoobJoin:Message_Receive(message, "whitelist")
+			-- new in R55
+			if Utils:IsInHeist() then
+				NoobJoin.Players[peer_id][4] = managers.game_play_central and managers.game_play_central:get_heist_timer()
 			end
-			if not DelayedInspectI then
-				NoobJoin:PD2Stats_API_Check(peer:user_id(), peer_id, true)
-			end
+		else
+			-- new in R55
+			NoobJoin:Player_Announce(peer, true)
 		end
 	end)
 
 	Hooks:Add("NetworkGameOnGameJoined", "NoobJoin:GameJoined", function(local_peer, id)
-		--[[	Hook from BaseMod.lua in R41
-		]]
 		if Network:is_client() then
 			DelayedCalls:Add("game_joined_check" , 2, function()
 				if managers.network:session() and managers.network:session():peers() then
-					local message
 					for _, peer in pairs(managers.network:session():peers()) do
-						if NoobJoin:is_from_whitelist(peer:user_id()) == true then
-							message = peer:name() .. " " .. managers.localization:text("player_whitelist")
-							NoobJoin:Message_Receive(message, "whitelist")
-						elseif NoobJoin:Is_From_Blacklist(peer:user_id()) == true then
-							message = peer:name() .. " " .. managers.localization:text("player_blacklist")
-							NoobJoin:Message_Receive(message, "kick")
-						elseif NoobJoin:Is_Friend(peer:user_id()) == true then
-							message = peer:name() .. " " .. managers.localization:text("player_friendlist")
-							NoobJoin:Message_Receive(message, "whitelist")
-							if NoobJoin.settings.friend_whitelist_val == false then
-								NoobJoin:PD2Stats_API_Check(peer:user_id(), peer:id(), false)
-							end
-						else
-							NoobJoin:PD2Stats_API_Check(peer:user_id(), peer:id(), false)
-						end
+						NoobJoin:Player_Announce(peer, false)
 					end
 					NoobJoin:Lookup_Skills_and_Perk_Deck(true)
 				end
@@ -64,23 +37,8 @@ if RequiredScript == "lib/network/base/networkpeer" then
 		if Network:is_server() then
 			DelayedCalls:Add("load_complete_check" , 2, function()
 				if managers.network:session() and managers.network:session():peers() then
-					local message
 					for _, peer in pairs(managers.network:session():peers()) do
-						if NoobJoin:is_from_whitelist(peer:user_id()) == true then
-							message = peer:name() .. " " .. managers.localization:text("player_whitelist")
-							NoobJoin:Message_Receive(message, "whitelist")
-						elseif NoobJoin:Is_From_Blacklist(peer:user_id()) == true then
-							message = peer:name() .. " " .. managers.localization:text("player_blacklist")
-							NoobJoin:Message_Receive(message, "kick")
-						elseif NoobJoin:Is_Friend(peer:user_id()) == true then
-							message = peer:name() .. " " .. managers.localization:text("player_friendlist")
-							NoobJoin:Message_Receive(message, "whitelist")
-							if NoobJoin.settings.friend_whitelist_val == false then
-								NoobJoin:PD2Stats_API_Check(peer:user_id(), peer:id(), false)
-							end
-						else
-							NoobJoin:PD2Stats_API_Check(peer:user_id(), peer:id(), false)
-						end
+						NoobJoin:Player_Announce(peer, false)
 					end
 					NoobJoin:Lookup_Skills_and_Perk_Deck(true)
 				end
@@ -92,23 +50,8 @@ if RequiredScript == "lib/network/base/networkpeer" then
 		if Network:is_client() then
 			DelayedCalls:Add("modify_node_check" , 2, function()
 				if managers.network:session() and managers.network:session():peers() then
-					local message
 					for _, peer in pairs(managers.network:session():peers()) do
-						if NoobJoin:is_from_whitelist(peer:user_id()) == true then
-							message = peer:name() .. " " .. managers.localization:text("player_whitelist")
-							NoobJoin:Message_Receive(message, "whitelist")
-						elseif NoobJoin:Is_From_Blacklist(peer:user_id()) == true then
-							message = peer:name() .. " " .. managers.localization:text("player_blacklist")
-							NoobJoin:Message_Receive(message, "kick")
-						elseif NoobJoin:Is_Friend(peer:user_id()) == true then
-							message = peer:name() .. " " .. managers.localization:text("player_friendlist")
-							NoobJoin:Message_Receive(message, "whitelist")
-							if NoobJoin.settings.friend_whitelist_val == false then
-								NoobJoin:PD2Stats_API_Check(peer:user_id(), peer:id(), false)
-							end
-						else
-							NoobJoin:PD2Stats_API_Check(peer:user_id(), peer:id(), false)
-						end
+						NoobJoin:Player_Announce(peer, false)
 					end
 					NoobJoin:Lookup_Skills_and_Perk_Deck(true)
 				end
@@ -119,7 +62,7 @@ if RequiredScript == "lib/network/base/networkpeer" then
 	Hooks:PostHook(MenuSceneManager, "set_lobby_character_out_fit", "NoobJoin:OutfitChange", function(ply)
 		if Network:is_client() then
 			NoobJoin:Lookup_Skills_and_Perk_Deck(true)
-		elseif Network:is_server() then
+		else
 			NoobJoin:Lookup_Skills_and_Perk_Deck(false)
 		end
 	end)
@@ -128,6 +71,7 @@ if RequiredScript == "lib/network/base/networkpeer" then
 		NoobJoin.Players[peer_id][1] = false
 		NoobJoin.Players[peer_id][2] = false
 		NoobJoin.Players[peer_id][3] = 0
+		NoobJoin.Players[peer_id][4] = 0
 	end)
 
 	Hooks:PostHook(NetworkPeer, "mark_cheater", "NoobJoin:CheaterCaught", function(self, reason, auto_kick)
@@ -153,6 +97,7 @@ end
 
 if RequiredScript == "lib/network/base/basenetworksession" then
 	Printed = false
+	Current_time = 0
 	Hooks:PostHook(BaseNetworkSession, "on_set_member_ready", "NoobJoin:Deployables", function(self, peer_id, ready, state_changed, from_network)
 		if Network:is_server() then
 			if Global.game_settings.difficulty == "overkill" or Global.game_settings.difficulty == "overkill_145" or Global.game_settings.difficulty == "overkill_290" then
@@ -166,9 +111,10 @@ if RequiredScript == "lib/network/base/basenetworksession" then
 	Hooks:PostHook(BaseNetworkSession, "on_statistics_recieved", "NoobJoin:Stats", function(self, peer_id, peer_kills, peer_specials_kills, peer_head_shots, accuracy, downs)
 		if Printed == false then
 			Printed = true
+			Current_time = managers.game_play_central and managers.game_play_central:get_heist_timer() or 0
 			DelayedCalls:Add("NoobJoin:Statistics_message", 0.5, function()
 				if NoobJoin.settings.Stats_Print == true then
-					local message = managers.localization:text("Newbie_Statistics") .. ":" .. " " .. managers.localization:text("Newbie_Kills") .. " | " .. managers.localization:text("Newbie_Spec_Kills") .. " | " .. managers.localization:text("Newbie_Headshots") .. " | " .. managers.localization:text("Newbie_Accuracy") .. " | " .. managers.localization:text("Newbie_Downs")
+					local message = managers.localization:text("Newbie_Statistics") .. ":" .. " " .. managers.localization:text("Newbie_Kills") .. " | " .. managers.localization:text("Newbie_Kill_Per_Minute") .. " | " .. managers.localization:text("Newbie_Spec_Kills") .. " | " .. managers.localization:text("Newbie_Headshots") .. " | " .. managers.localization:text("Newbie_Accuracy") .. " | " .. managers.localization:text("Newbie_Downs")
 					NoobJoin:Message_Receive(message, 2)
 				end
 			end)
@@ -176,8 +122,12 @@ if RequiredScript == "lib/network/base/basenetworksession" then
 		DelayedCalls:Add("NoobJoin:Statistics_message_peer_" .. tostring(peer_id) , 0.7, function()
 			if NoobJoin.settings.Stats_Print == true then
 				local peer = managers.network:session():peer(peer_id)
+				local kpm = peer_kills
+				if Current_time > 60 and peer_kills > 0 then
+					kpm =(math.floor(((peer_kills / ((Current_time/60)-(NoobJoin.Players[peer_id][4]/60))) + 1/2)/1) * 1)
+				end
 				if peer:has_statistics() then
-					local message = peer:name() .. " | K:" .. peer_kills .. " | S/K:" .. peer_specials_kills .. " | H:" .. peer_head_shots .. " | A:" .. accuracy .. " % | D:" .. downs .. " "
+					local message = peer:name() .. " | K:" .. peer_kills .. " | KPM:" .. kpm .. " | S/K:" .. peer_specials_kills .. " | H:" .. peer_head_shots .. " | A:" .. accuracy .. " % | D:" .. downs .. " оЂ”"
 					NoobJoin:Message_Receive(message, 2)
 				end
 			end

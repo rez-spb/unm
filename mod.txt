@@ -1,9 +1,9 @@
 {
 	"name" : "UNM",
-	"description" : "UnNoobMe, based on NGBTO R54",
+	"description" : "UnNoobMe, based on NGBTO R55",
 	"author" : "Rez",
-	"contact" : "Don't",
-	"version" : "0.0.1",
+	"contact" : "https://github.com/rez-spb/unm",
+	"version" : "0.0.2",
 	"hooks" : 
 	[
 		{

@@ -1,3 +1,7 @@
+===[v0.0.2]=====================================================================
+ + added github address to contact information
+ ! merged with NGBTO R55
+
 ===[v0.0.1]=====================================================================
  + mod works on 'very hard' difficulty
  + whitelist.ini is now present, uses the same config format as blacklist.ini

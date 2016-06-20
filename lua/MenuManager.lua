@@ -9,6 +9,13 @@ if not _G.NoobJoin then
 	NoobJoin._path = ModPath		-- BLT-specific, points to mod's root directory
 	NoobJoin._data_path = SavePath .. "unm_savefile.txt"	-- saving data to file
 	NoobJoin._loc_path = NoobJoin._path .. "loc/"	-- path for localization
+	--[[ [UNM-18] Pretty print for JSON (setting prepare)
+	NoobJoin._pretty = {			-- pretty encode for JSON4Lua pretty_print branch (currently in pull requests)
+		sort_keys=true,			-- sort keys alphanum
+		pretty=true,			-- insert spaces after ':' and breaks after ','
+		indent=4,			-- indent size in, spaces
+		}
+	]]--
 	NoobJoin.settings = {			-- defaults (in case we don't have a file to read from)
 		friend_whitelist_val = true,	-- whitelist friends by default
 		kickhidden_val = false,		-- don't kick hidden players

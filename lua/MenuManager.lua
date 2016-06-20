@@ -12,10 +12,6 @@ if not _G.NoobJoin then
 	NoobJoin.settings = {			-- defaults (in case we don't have a file to read from)
 		friend_whitelist_val = true,	-- whitelist friends by default
 		kickhidden_val = false,		-- don't kick hidden players
-		min_hours_loud_dw_val = 6,
-		min_hours_stealth_dw_val = 7,
-		min_hours_loud_ovk_val = 4,
-		min_hours_stealth_ovk_val = 6,
 		Toggle = 1,			-- enable kicking, FIX: register
 		localised_message = false,	-- TODO: localization should become the only way
 		broadcastinfo_val = true,	-- broadcast to everyone if server
@@ -313,19 +309,19 @@ Hooks:Add("MenuManagerInitialize", "MenuManagerInitialize_NoobJoin", function(me
 		NoobJoin:Save()
 	end
 	MenuCallbackHandler.min_hours_loud_dw = function(this, item)
-		NoobJoin.settings.min_hours_loud_dw_val = item:value()
+		NoobJoin.settings.min_hours_loud_dw_val = math.floor(item:value())
 		NoobJoin:Save()
 	end
 	MenuCallbackHandler.min_hours_stealth_dw = function(this, item)
-		NoobJoin.settings.min_hours_stealth_dw_val = item:value()
+		NoobJoin.settings.min_hours_stealth_dw_val = math.floor(item:value())
 		NoobJoin:Save()
 	end
 	MenuCallbackHandler.min_hours_loud_ovk = function(this, item)
-		NoobJoin.settings.min_hours_loud_ovk_val = item:value()
+		NoobJoin.settings.min_hours_loud_ovk_val = math.floor(item:value())
 		NoobJoin:Save()
 	end
 	MenuCallbackHandler.min_hours_stealth_ovk = function(this, item)
-		NoobJoin.settings.min_hours_stealth_ovk_val = item:value()
+		NoobJoin.settings.min_hours_stealth_ovk_val = math.floor(item:value())
 		NoobJoin:Save()
 	end
 	MenuCallbackHandler.min_hours_loud_vh = function(this, item)

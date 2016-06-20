@@ -126,56 +126,52 @@
 			"size" : 20,
 		},
 		{
-			"type" : "multiple_choice",
+			"type" : "slider",
 			"id" : "min_hours_loud_dw_id",
 			"title" : "noobie_loud_dw_options_hours",
 			"description" : "noobie_loud_dw_options_hours_desc",
 			"callback" : "min_hours_loud_dw",
-			"items" : [
-				"0","20","40","60","80","100","120","140","160","180","200","220","240","260","280","300","320","340","360","380","400", "420", "440", "460", "480", "500", "520", "540", "560", "580", "600", "620", "640", "660", "680", "700", "720", "740", "760", "780", "800", "820", "840", "860", "880", "900", "920", "940", "960", "980", "1000"
-			],
 			"value" : "min_hours_loud_dw_val",
-			"default_value" : 6,
+			"default_value" : 100,
+			"max" : 500,
+			"min" : 0,
+			"step" : 10,
 		},
 		{
-			"type" : "multiple_choice",
+			"type" : "slider",
 			"id" : "min_hours_stealth_dw_id",
 			"title" : "noobie_stealth_dw_options_hours",
 			"description" : "noobie_stealth_dw_options_hours_desc",
 			"callback" : "min_hours_stealth_dw",
-			"items" : [
-				"0","20","40","60","80","100","120","140","160","180","200","220","240","260","280","300","320","340","360","380","400", "420", "440", "460", "480", "500", "520", "540", "560", "580", "600"
-			],
 			"value" : "min_hours_stealth_dw_val",
-			"default_value" : 7,
+			"default_value" : 120,
+			"max" : 500,
+			"min" : 0,
+			"step" : 10,
 		},
 		{
-			"type" : "multiple_choice",
+			"type" : "slider",
 			"id" : "min_hours_loud_ovk_id",
 			"title" : "noobie_loud_ovk_options_hours",
 			"description" : "noobie_loud_ovk_options_hours_desc",
 			"callback" : "min_hours_loud_ovk",
-			"items" : [
-				"0","20","40","60","80","100","120","140","160","180","200","220","240","260","280","300"
-			],
 			"value" : "min_hours_loud_ovk_val",
-			"default_value" : 4,
+			"default_value" : 60,
+			"max" : 500,
+			"min" : 0,
+			"step" : 10,
 		},
 		{
-			"type" : "multiple_choice",
+			"type" : "slider",
 			"id" : "min_hours_stealth_ovk_id",
 			"title" : "noobie_stealth_ovk_options_hours",
 			"description" : "noobie_stealth_ovk_options_hours_desc",
 			"callback" : "min_hours_stealth_ovk",
-			"items" : [
-				"0","20","40","60","80","100","120","140","160","180","200","220","240","260","280","300"
-			],
 			"value" : "min_hours_stealth_ovk_val",
-			"default_value" : 6,
-		},
-		{
-			"type" : "divider",
-			"size" : 20,
+			"default_value" : 80,
+			"max" : 500,
+			"min" : 0,
+			"step" : 10,
 		},
 		{
 			"type" : "slider",

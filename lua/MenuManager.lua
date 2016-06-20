@@ -1255,8 +1255,8 @@ function NoobJoin:Compose_Skill_String(peer)
 			message = message .. "" .. sk[13] .. ":" .. sk[14] .. ":" .. sk[15] .. "| "
 			message = message .. perk_suffix
 		else
-			-- something strange here: couldn't get skills?
-			message = message .. perk_suffix .. " (no skills?)"
+			-- couldn't get skills due to PD2 bug
+			message = message .. perk_suffix -- .. " (no skills?)"
 		end
 	end
 	return message

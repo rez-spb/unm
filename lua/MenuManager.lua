@@ -1508,15 +1508,15 @@ function NoobJoin:Return_Minimum_Hours()
 	local hours = -1
 	if Global.game_settings.difficulty == "overkill_290" then
 		if Global.game_settings.job_plan == -1 or Global.game_settings.job_plan == 1 then
-			hours = ((NoobJoin.settings.min_hours_loud_dw_val * 20) - 20)
+			hours = NoobJoin.settings.min_hours_loud_dw_val
 		else
-			hours = ((NoobJoin.settings.min_hours_stealth_dw_val * 20) - 20)
+			hours = NoobJoin.settings.min_hours_stealth_dw_val
 		end
 	elseif Global.game_settings.difficulty == "overkill_145" then
 		if Global.game_settings.job_plan == -1 or Global.game_settings.job_plan == 1 then
-			hours = ((NoobJoin.settings.min_hours_loud_ovk_val * 20) - 20)
+			hours = NoobJoin.settings.min_hours_loud_ovk_val
 		else
-			hours = ((NoobJoin.settings.min_hours_stealth_ovk_val * 20) - 20)
+			hours = NoobJoin.settings.min_hours_stealth_ovk_val
 		end
 	elseif Global.game_settings.difficulty == "overkill" then
 		if Global.game_settings.job_plan == -1 or Global.game_settings.job_plan == 1 then

@@ -213,7 +213,7 @@ Hooks:Add("MenuManagerInitialize", "MenuManagerInitialize_NoobJoin", function(me
 				function(page)
 					local reason = ""
 					local IsNoobJoinastring = ""
-					local cheater = false
+					local cheater = false	-- not enough heists from pd2stats
 					local cheater1 = false
 					message = ""
 					for param, val in string.gmatch(page, "([%w_]+)=([%w_]+)") do
@@ -726,6 +726,7 @@ function NGBTO_player_inspect(id)
 				local reason = ""
 				for param, val in string.gmatch(page, "([%w_]+)=([%w_]+)") do
 					if string.len(val) > 17 then
+						-- CHECK: reason is not used anywhere else, bug?
 						reason = string.gsub(val, "_", " ")
 						IsNoobJoinastring = string.find(reason, "Not enough heists completed") and true or false
 						if NoobJoin.settings.tag_not_enough_heists_completed == true then
@@ -756,6 +757,7 @@ function NGBTO_player_inspect(id)
 						end
 						local message = ""
 						if sum ~= 0 then
+							-- CHECK: old format?
 							skill = "M(" .. sk[1] .. ":" .. sk[2] .. ":" .. sk[3] .. ") E(" .. sk[4] .. ":" .. sk[5] .. ":" .. sk[6] .. ") T(" .. sk[7] .. ":" .. sk[8] .. ":" .. sk[9] .. ") G(" .. sk[10] .. ":" .. sk[11] .. ":" .. sk[12]  .. ") F(" .. sk[13] .. ":" .. sk[14] .. ":" .. sk[15] .. ")"
 						end
 						perk_deck_completion = " " .. perk_deck[2] .. "/" .. "9"
@@ -1380,7 +1382,7 @@ function NoobJoin:Is_From_Blacklist(user_id)
 end
 
 function NoobJoin:Add_Cheater(user_id, username, reason)
-	if NoobJoin:Is_From_Blacklist(user_id) == false and NoobJoin:Is_Friend(user_id) == false then
+	if NoobJoin:Is_From_Blacklist(user_id) == false and (NoobJoin:Is_Friend(user_id) == false or NoobJoin.friend_whitelist_val == false) then
 		table.insert(NoobJoin.blacklist, user_id)
 		local time = os.date("*t")
 		local timestamp = {time.year, time.month, time.day, time.hour, time.min, time.sec}
@@ -1390,7 +1392,7 @@ function NoobJoin:Add_Cheater(user_id, username, reason)
 			end
 		end
 		timestamp = timestamp[1] .. "-" .. timestamp[2] .. "-" .. timestamp[3] .. " " .. timestamp[4] .. ":" .. timestamp[5] .. ":" .. timestamp[6]
-		file = io.open(NoobJoin._path .. "blacklist.ini", "a")
+		file = io.open(NoobJoin.blacklist_file, "a")
 		file:write("\n" .. user_id .. "\n" .. ";" .. username .. " reason: " .. reason .. ". Date: " .. timestamp)
 		file:close()
 	end

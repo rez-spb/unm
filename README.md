@@ -6,17 +6,20 @@ UNM was started as an attempt to expand NGBTO ('Noobs Go Back To Overkill' mod b
 UNM had its first working realization in April 2016, forked from NGBTO R41.
 
 ## Current situation
-Overkill (PD2 devs) announced skill tree changes, so project was stalled as no one actually knew what the changes would be like. Current implementation (UNM v0.0.1) is based on NGBTO R54 by FishTaco and is not yet fully ready for public use, so please don't use it. I mean it: bugs and messy code from initial developer is present and is probably multiplied by bugs of my own origin.
+Current implementation (UNM v0.1.0) is based on NGBTO R55 by FishTaco and is not yet fully ready for public use, so use it at your own risk.
+I mean it: bugs and messy code from initial developer are present and are probably multiplied by bugs of my own origin.
 
-## Features and diffs (vs NGBTO R54)
+## Features and diffs (vs NGBTO R55)
 * works with VH difficulty
 * has whitelist for those who you play with but who are not in your friend list
 * blacklist now takes priority over friendlist (so your cheater friends will be kicked unless added to whitelist or you can just ban any friend you don't want to play with)
 * changed skills lookup format (more brief now)
+* introduced sliders for difficulty selection purpose
 * dropped all the localization (trying to focus on the code for the time being, will return it later)
 
 ## Changelog
-All the information about changes will be present in changelog.txt file.
+All the information about changes will be present in {{changelog.txt}} file.
+Changes from NGBTO are preserved in {{changelog_ngbto.txt}} file.
 
 ## Future plans
 * support for all the difficulties

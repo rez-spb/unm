@@ -1,3 +1,9 @@
+===[v0.1.0]=====================================================================
+ + [UNM-19] Change license to GPL
+ ! [UNM-9] All difficulty options should use sliders
+ ! [UNM-15] Remove 'ol_' at the end of statistics string
+ ! [UNM-16] Remove '(no skills)' suffix
+
 ===[v0.0.2]=====================================================================
  + added github address to contact information
  ! merged with NGBTO R55

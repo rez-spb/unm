@@ -2,7 +2,7 @@
 UnNoob Me (UNM) — Payday 2 mod for keeping noobs out. Based on NGBTO. Requires BLT.
 
 ## Some not so ancient history
-UNM was started as an attempt to expand NGBTO ('Noobs Go Back To Overkill' mod by FishTaco) so that it works on very hard difficulty. Later an idea to separate Steam friendlist and whitelist (opposed to blacklist) was born and implemented. However, those changes did not receive warm welcome from FishTaco, so I had to work on my own.
+UNM was started as an attempt to expand NGBTO ('Noobs Go Back To Overkill' mod by FishTaco) so that it works on very hard difficulty. Later an idea to separate Steam friendlist and whitelist (opposed to blacklist) was born and implemented. However, those ideas did not receive warm welcome from FishTaco, so I had to work on my own.
 UNM had its first working realization in April 2016, forked from NGBTO R41.
 
 ## Current situation
@@ -30,5 +30,4 @@ All the information about changes will be present in changelog.txt file.
 * Rez — bug fixes, adjustments, improvements for UNM (not affiliated with NGBTO)
 
 ## License
-Currently I go with no license as in 'all rights reserved' till I get this to something stable.
-Will be released under latest GPL.
+Released under GPL (see {{LICENSE.md}} file for full license text)
